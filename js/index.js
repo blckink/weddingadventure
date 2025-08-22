@@ -57,6 +57,73 @@ function extendLevelRight(layerArrays, extraColumns = LEVEL_EXTENSION_COLUMNS) {
   })
 }
 
+function createFillerLayer(collisions) {
+  const rows = collisions.length
+  const cols = collisions[0].length
+  const visited = Array.from({ length: rows }, () => Array(cols).fill(false))
+  const filler = Array.from({ length: rows }, () => Array(cols).fill(0))
+
+  const queue = []
+
+  for (let x = 0; x < cols; x++) {
+    if (collisions[0][x] === 0) {
+      queue.push([0, x])
+      visited[0][x] = true
+    }
+    if (collisions[rows - 1][x] === 0) {
+      queue.push([rows - 1, x])
+      visited[rows - 1][x] = true
+    }
+  }
+
+  for (let y = 0; y < rows; y++) {
+    if (collisions[y][0] === 0) {
+      queue.push([y, 0])
+      visited[y][0] = true
+    }
+    if (collisions[y][cols - 1] === 0) {
+      queue.push([y, cols - 1])
+      visited[y][cols - 1] = true
+    }
+  }
+
+  const directions = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ]
+
+  while (queue.length) {
+    const [y, x] = queue.shift()
+    for (const [dy, dx] of directions) {
+      const ny = y + dy
+      const nx = x + dx
+      if (
+        ny >= 0 &&
+        ny < rows &&
+        nx >= 0 &&
+        nx < cols &&
+        !visited[ny][nx] &&
+        collisions[ny][nx] === 0
+      ) {
+        visited[ny][nx] = true
+        queue.push([ny, nx])
+      }
+    }
+  }
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (collisions[y][x] === 0 && !visited[y][x]) {
+        filler[y][x] = 1
+      }
+    }
+  }
+
+  return filler
+}
+
 extendLevelRight([
   collisions,
   l_New_Layer_1,
@@ -82,6 +149,10 @@ collisions.forEach((row, y) => {
     }
   })
 })
+
+const l_Filler = createFillerLayer(collisions)
+layersData.l_Filler = l_Filler
+tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILE_SIZE }
 
 const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * TILE_SIZE
 
