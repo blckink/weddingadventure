@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Level Editor</title>
   <style>
     body { background: #222; color: #fff; font-family: sans-serif; }
@@ -9,6 +12,7 @@
     button { margin-right: 4px; }
     canvas { background: #333; image-rendering: pixelated; }
     #output { width: 100%; height: 100px; margin-top: 8px; }
+    #save-status { margin-top: 8px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -22,9 +26,17 @@
     <button id="extend">Extend Right</button>
   </div>
   <canvas id="editor" width="640" height="480"></canvas>
+  <div id="save-status"></div>
   <textarea id="output" placeholder="Saved level data will appear here"></textarea>
-  <script src="./data/collisions.js"></script>
-  <script src="./data/l_Gems.js"></script>
+  <script>
+    const cb = Date.now();
+    document.write(
+      '<script src="./data/collisions.js?cb=' + cb + '"></' + 'script>'
+    );
+    document.write(
+      '<script src="./data/l_Gems.js?cb=' + cb + '"></' + 'script>'
+    );
+  </script>
   <script src="js/editor.js"></script>
 </body>
 </html>

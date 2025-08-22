@@ -153,17 +153,24 @@ document.getElementById('save').addEventListener('click', async () => {
   gems.forEach((g) => {
     gemGrid[g.y][g.x] = 18;
   });
+  const statusEl = document.getElementById('save-status');
   try {
-    const res = await fetch('/save', {
+    const res = await fetch('save.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ collisions: floors, gems: gemGrid }),
+      cache: 'no-store',
     });
+    if (!res.ok) throw new Error('Save failed');
     const text = await res.text();
     document.getElementById('output').value = text;
+    statusEl.textContent = 'Level saved';
+    statusEl.style.color = 'lightgreen';
   } catch (err) {
     console.error(err);
     document.getElementById('output').value = 'Save failed';
+    statusEl.textContent = 'Save failed';
+    statusEl.style.color = 'red';
   }
   localStorage.setItem(
     'editorMap',
