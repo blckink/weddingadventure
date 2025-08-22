@@ -42,7 +42,10 @@ const tilesets = {
   l_Trees: { imageUrl: './images/decorations.png', tileSize: 16 },
 }
 
-function extendLevelRight(layerArrays, extraColumns = 10) {
+const TILE_SIZE = 16
+const LEVEL_EXTENSION_COLUMNS = 20
+
+function extendLevelRight(layerArrays, extraColumns = LEVEL_EXTENSION_COLUMNS) {
   layerArrays.forEach((layer) => {
     layer.forEach((row) => {
       const extension = row.slice(-extraColumns)
@@ -66,10 +69,12 @@ extendLevelRight([
   l_Gems,
 ])
 
+const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * TILE_SIZE
+
 // Tile setup
 const collisionBlocks = []
 const platforms = []
-const blockSize = 16 // Assuming each tile is 16x16 pixels
+const blockSize = TILE_SIZE // Assuming each tile is 16x16 pixels
 
 collisions.forEach((row, y) => {
   row.forEach((symbol, x) => {
@@ -332,6 +337,38 @@ function init() {
       height: 28,
     }),
   ]
+
+  oposums.push(
+    new Oposum({
+      x: 1663 + LEVEL_EXTENSION_OFFSET,
+      y: 200,
+      width: 36,
+      height: 28,
+    }),
+  )
+
+  gems.push(
+    new Sprite({
+      x: 1800 + LEVEL_EXTENSION_OFFSET,
+      y: 100,
+      width: 15,
+      height: 13,
+      imageSrc: './images/gem.png',
+      spriteCropbox: {
+        x: 0,
+        y: 0,
+        width: 15,
+        height: 13,
+        frames: 5,
+      },
+      hitbox: {
+        x: 1800 + LEVEL_EXTENSION_OFFSET,
+        y: 100,
+        width: 15,
+        height: 13,
+      },
+    }),
+  )
 
   sprites = []
   hearts = [
