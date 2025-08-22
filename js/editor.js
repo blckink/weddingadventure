@@ -30,7 +30,7 @@ if (typeof l_Gems !== 'undefined') {
 
 const defaultState = JSON.parse(JSON.stringify({ floors, enemies, gems }));
 let floorImg;
-let enemyImg;
+const enemyImgs = {};
 let gemImg;
 
 function loadImage(src) {
@@ -45,16 +45,18 @@ function loadImage(src) {
 Promise.all([
   loadImage('./images/tileset.png'),
   loadImage('./images/oposum.png'),
+  loadImage('./images/eagle.png'),
   loadImage('./images/gem.png'),
-]).then(([tile, enemy, gem]) => {
+]).then(([tile, oposum, eagle, gem]) => {
   floorImg = tile;
-  enemyImg = enemy;
+  enemyImgs.oposum = oposum;
+  enemyImgs.eagle = eagle;
   gemImg = gem;
   const saved = localStorage.getItem('editorMap');
   if (saved) {
     const parsed = JSON.parse(saved);
     floors = parsed.floors;
-    enemies = parsed.enemies;
+    enemies = (parsed.enemies || []).map((e) => ({ type: 'oposum', ...e }));
     gems = parsed.gems;
     gridHeight = floors.length;
     gridWidth = floors[0].length;
@@ -89,7 +91,8 @@ function drawGrid() {
   }
 
   enemies.forEach((e) => {
-    ctx.drawImage(enemyImg, e.x * tileSize, e.y * tileSize, tileSize, tileSize);
+    const img = enemyImgs[e.type] || enemyImgs.oposum;
+    if (img) ctx.drawImage(img, e.x * tileSize, e.y * tileSize, tileSize, tileSize);
   });
 
   gems.forEach((g) => {
@@ -128,8 +131,9 @@ function handle(evt) {
 
   if (currentTool === 'floor') {
     floors[y][x] = 1;
-  } else if (currentTool === 'enemy') {
-    if (!enemies.some((e) => e.x === x && e.y === y)) enemies.push({ x, y });
+  } else if (currentTool.startsWith('enemy-')) {
+    const type = currentTool.split('-')[1];
+    if (!enemies.some((e) => e.x === x && e.y === y)) enemies.push({ x, y, type });
   } else if (currentTool === 'gem') {
     if (!gems.some((g) => g.x === x && g.y === y)) gems.push({ x, y });
   } else if (currentTool === 'erase') {
