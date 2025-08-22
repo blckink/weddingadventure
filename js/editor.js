@@ -5,9 +5,40 @@ const tileSize = 32;
 const gridWidth = canvas.width / tileSize;
 const gridHeight = canvas.height / tileSize;
 
-const floors = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(0));
+let floors = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(0));
 let enemies = [];
 let gems = [];
+const defaultState = JSON.parse(JSON.stringify({ floors, enemies, gems }));
+let floorImg;
+let enemyImg;
+let gemImg;
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+Promise.all([
+  loadImage('./images/tileset.png'),
+  loadImage('./images/oposum.png'),
+  loadImage('./images/gem.png'),
+]).then(([tile, enemy, gem]) => {
+  floorImg = tile;
+  enemyImg = enemy;
+  gemImg = gem;
+  const saved = localStorage.getItem('editorMap');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    floors = parsed.floors;
+    enemies = parsed.enemies;
+    gems = parsed.gems;
+  }
+  drawGrid();
+});
 let currentTool = 'floor';
 
 function drawGrid() {
@@ -16,28 +47,37 @@ function drawGrid() {
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
       if (floors[y][x]) {
-        ctx.fillStyle = '#555';
-        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        ctx.drawImage(
+          floorImg,
+          0,
+          0,
+          16,
+          16,
+          x * tileSize,
+          y * tileSize,
+          tileSize,
+          tileSize,
+        );
       }
       ctx.strokeStyle = '#444';
       ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
     }
   }
 
-  ctx.fillStyle = 'red';
   enemies.forEach((e) => {
-    ctx.fillRect(e.x * tileSize + 8, e.y * tileSize + 8, tileSize - 16, tileSize - 16);
+    ctx.drawImage(enemyImg, e.x * tileSize, e.y * tileSize, tileSize, tileSize);
   });
 
-  ctx.fillStyle = 'cyan';
   gems.forEach((g) => {
-    ctx.beginPath();
-    ctx.arc(g.x * tileSize + tileSize / 2, g.y * tileSize + tileSize / 2, tileSize / 4, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.drawImage(
+      gemImg,
+      g.x * tileSize + tileSize / 4,
+      g.y * tileSize + tileSize / 4,
+      tileSize / 2,
+      tileSize / 2,
+    );
   });
 }
-
-drawGrid();
 
 function getPos(evt) {
   const rect = canvas.getBoundingClientRect();
@@ -93,4 +133,14 @@ document.getElementById('save').addEventListener('click', () => {
   a.download = 'map.json';
   a.click();
   URL.revokeObjectURL(url);
+  localStorage.setItem('editorMap', data);
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  const state = JSON.parse(JSON.stringify(defaultState));
+  floors = state.floors;
+  enemies = state.enemies;
+  gems = state.gems;
+  localStorage.removeItem('editorMap');
+  drawGrid();
 });
