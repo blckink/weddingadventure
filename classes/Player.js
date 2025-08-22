@@ -213,6 +213,7 @@ class Player {
   }
 
   jump() {
+    if (!this.isOnGround) return
     this.velocity.y = -JUMP_POWER
     this.isOnGround = false
   }
