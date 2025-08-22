@@ -42,6 +42,30 @@ const tilesets = {
   l_Trees: { imageUrl: './images/decorations.png', tileSize: 16 },
 }
 
+function extendLevelRight(layerArrays, extraColumns = 10) {
+  layerArrays.forEach((layer) => {
+    layer.forEach((row) => {
+      const extension = row.slice(-extraColumns)
+      row.push(...extension)
+    })
+  })
+}
+
+extendLevelRight([
+  collisions,
+  l_New_Layer_1,
+  l_New_Layer_2,
+  l_New_Layer_8,
+  l_Back_Tiles,
+  l_Decorations,
+  l_Front_Tiles,
+  l_Shrooms,
+  l_Collisions,
+  l_Grass,
+  l_Trees,
+  l_Gems,
+])
+
 // Tile setup
 const collisionBlocks = []
 const platforms = []
@@ -95,9 +119,14 @@ const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
 }
 
 const renderStaticLayers = async (layersData) => {
+  const tileSize = 16
+  const layerArrays = Object.values(layersData)
+  const maxWidth = Math.max(...layerArrays.map((layer) => layer[0].length))
+  const maxHeight = Math.max(...layerArrays.map((layer) => layer.length))
+
   const offscreenCanvas = document.createElement('canvas')
-  offscreenCanvas.width = canvas.width
-  offscreenCanvas.height = canvas.height
+  offscreenCanvas.width = maxWidth * tileSize
+  offscreenCanvas.height = maxHeight * tileSize
   const offscreenContext = offscreenCanvas.getContext('2d')
 
   for (const [layerName, tilesData] of Object.entries(layersData)) {
