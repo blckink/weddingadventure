@@ -70,11 +70,16 @@ extendLevelRight([
   l_Grass,
   l_Trees,
   l_Gems,
+  l_Enemies,
 ])
 
 collisions.forEach((row, y) => {
   row.forEach((symbol, x) => {
     l_Collisions[y][x] = symbol === 1 ? 1 : 0
+    if (symbol === 0) {
+      if (l_Back_Tiles[y]) l_Back_Tiles[y][x] = 0
+      if (l_Front_Tiles[y]) l_Front_Tiles[y][x] = 0
+    }
   })
 })
 
@@ -312,50 +317,33 @@ function init() {
     size: 32,
     velocity: { x: 0, y: 0 },
   })
-  eagles = [
-    new Eagle({
-      x: 816,
-      y: 172,
-      width: 40,
-      height: 41,
-    }),
-  ]
-
-  oposums = [
-    new Oposum({
-      x: 650,
-      y: 100,
-      width: 36,
-      height: 28,
-    }),
-    new Oposum({
-      x: 906,
-      y: 515,
-      width: 36,
-      height: 28,
-    }),
-    new Oposum({
-      x: 1150,
-      y: 515,
-      width: 36,
-      height: 28,
-    }),
-    new Oposum({
-      x: 1663,
-      y: 200,
-      width: 36,
-      height: 28,
-    }),
-  ]
-
-  oposums.push(
-    new Oposum({
-      x: 1663 + LEVEL_EXTENSION_OFFSET,
-      y: 200,
-      width: 36,
-      height: 28,
-    }),
-  )
+  eagles = []
+  oposums = []
+  if (typeof l_Enemies !== 'undefined') {
+    l_Enemies.forEach((row, y) => {
+      row.forEach((symbol, x) => {
+        if (symbol === 1) {
+          oposums.push(
+            new Oposum({
+              x: x * 16,
+              y: y * 16,
+              width: 36,
+              height: 28,
+            }),
+          )
+        } else if (symbol === 2) {
+          eagles.push(
+            new Eagle({
+              x: x * 16,
+              y: y * 16,
+              width: 40,
+              height: 41,
+            }),
+          )
+        }
+      })
+    })
+  }
 
   gems.push(
     new Sprite({

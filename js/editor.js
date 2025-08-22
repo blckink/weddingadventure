@@ -28,6 +28,15 @@ if (typeof l_Gems !== 'undefined') {
   });
 }
 
+if (typeof l_Enemies !== 'undefined') {
+  l_Enemies.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      if (cell === 1) enemies.push({ x, y, type: 'oposum' });
+      else if (cell === 2) enemies.push({ x, y, type: 'eagle' });
+    });
+  });
+}
+
 const defaultState = JSON.parse(JSON.stringify({ floors, enemies, gems }));
 let floorImg;
 const enemyImgs = {};
@@ -56,8 +65,8 @@ Promise.all([
   if (saved) {
     const parsed = JSON.parse(saved);
     floors = parsed.floors;
-    enemies = (parsed.enemies || []).map((e) => ({ type: 'oposum', ...e }));
-    gems = parsed.gems;
+    enemies = parsed.enemies || [];
+    gems = parsed.gems || [];
     gridHeight = floors.length;
     gridWidth = floors[0].length;
     canvas.width = gridWidth * tileSize;
@@ -172,12 +181,18 @@ document.getElementById('save').addEventListener('click', async () => {
   gems.forEach((g) => {
     gemGrid[g.y][g.x] = 18;
   });
+  const enemyGrid = Array.from({ length: gridHeight }, () =>
+    Array(gridWidth).fill(0),
+  );
+  enemies.forEach((e) => {
+    enemyGrid[e.y][e.x] = e.type === 'eagle' ? 2 : 1;
+  });
   const statusEl = document.getElementById('save-status');
   try {
     const res = await fetch('save.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ collisions: floors, gems: gemGrid }),
+      body: JSON.stringify({ collisions: floors, gems: gemGrid, enemies: enemyGrid }),
       cache: 'no-store',
     });
     if (!res.ok) throw new Error('Save failed');
