@@ -154,3 +154,28 @@ document.addEventListener(
 )
 
 document.addEventListener('dblclick', (e) => e.preventDefault())
+
+const startScreen = document.getElementById('start-screen')
+const startButton = document.getElementById('start-button')
+const codeButton = document.getElementById('code-button')
+const codeModal = document.getElementById('code-modal')
+const closeModalButton = document.getElementById('close-modal')
+
+if (startButton) {
+  startButton.addEventListener('click', () => {
+    if (startScreen) startScreen.style.display = 'none'
+    if (typeof startGame === 'function') startGame()
+  })
+}
+
+if (codeButton) {
+  codeButton.addEventListener('click', () => {
+    if (codeModal) codeModal.classList.remove('hidden')
+  })
+}
+
+if (closeModalButton) {
+  closeModalButton.addEventListener('click', () => {
+    if (codeModal) codeModal.classList.add('hidden')
+  })
+}
