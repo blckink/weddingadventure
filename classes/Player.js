@@ -1,5 +1,5 @@
 const X_VELOCITY = 200
-const JUMP_POWER = 250
+const JUMP_POWER = 275
 const GRAVITY = 580
 
 class Player {
