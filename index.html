@@ -21,6 +21,7 @@
         height: 100%;
         background: black;
         overflow: hidden;
+        touch-action: none;
       }
 
       canvas {
@@ -65,6 +66,19 @@
         background: rgba(255, 255, 255, 0.3);
         touch-action: none;
       }
+
+      #fullscreen-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        font-family: sans-serif;
+        touch-action: none;
+      }
     </style>
   </head>
   <body>
@@ -77,6 +91,7 @@
       <div id="joystick-knob"></div>
     </div>
     <div id="action-button"></div>
+    <button id="fullscreen-button">⛶</button>
     <script src="./data/l_New_Layer_1.js"></script>
     <script src="./data/l_New_Layer_2.js"></script>
     <script src="./data/l_New_Layer_8.js"></script>

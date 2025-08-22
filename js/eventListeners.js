@@ -96,3 +96,28 @@ if (actionButton) {
     player.roll()
   })
 }
+
+const fullscreenButton = document.getElementById('fullscreen-button')
+if (fullscreenButton) {
+  fullscreenButton.addEventListener('click', () => {
+    const elem = document.documentElement
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen()
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen()
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen()
+    }
+  })
+}
+
+document.addEventListener(
+  'touchmove',
+  (e) => {
+    e.preventDefault()
+  },
+  { passive: false },
+)
+document.addEventListener('gesturestart', (e) => e.preventDefault())
+document.addEventListener('gesturechange', (e) => e.preventDefault())
+document.addEventListener('gestureend', (e) => e.preventDefault())
