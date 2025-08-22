@@ -199,9 +199,6 @@ let camera = {
   y: 0,
 }
 
-const SCROLL_POST_RIGHT = 330
-const SCROLL_POST_TOP = 100
-const SCROLL_POST_BOTTOM = 220
 let oceanBackgroundCanvas = null
 let brambleBackgroundCanvas = null
 let gems = []
@@ -534,26 +531,20 @@ function animate(backgroundCanvas) {
     }
   }
 
-  // Track scroll post distance
-  if (player.x > SCROLL_POST_RIGHT && player.x < 1680) {
-    const scrollPostDistance = player.x - SCROLL_POST_RIGHT
-    camera.x = scrollPostDistance
-  }
-
-  if (player.y < SCROLL_POST_TOP && camera.y > 0) {
-    const scrollPostDistance = SCROLL_POST_TOP - player.y
-    camera.y = scrollPostDistance
-  }
-
-  if (player.y > SCROLL_POST_BOTTOM) {
-    const scrollPostDistance = player.y - SCROLL_POST_BOTTOM
-    camera.y = -scrollPostDistance
-  }
+  // Center camera on player
+  camera.x = Math.max(
+    0,
+    player.x - canvas.width / (2 * (dpr + 1))
+  )
+  camera.y = Math.max(
+    0,
+    player.y - canvas.height / (2 * (dpr + 1))
+  )
 
   // Render scene
   c.save()
   c.scale(dpr + 1, dpr + 1)
-  c.translate(-camera.x, camera.y)
+  c.translate(-camera.x, -camera.y)
   c.clearRect(0, 0, canvas.width, canvas.height)
   c.drawImage(oceanBackgroundCanvas, camera.x * 0.32, 0)
   c.drawImage(brambleBackgroundCanvas, camera.x * 0.16, 0)
@@ -580,9 +571,6 @@ function animate(backgroundCanvas) {
     gem.draw(c)
   }
 
-  // c.fillRect(SCROLL_POST_RIGHT, 100, 10, 100)
-  // c.fillRect(300, SCROLL_POST_TOP, 100, 10)
-  // c.fillRect(300, SCROLL_POST_BOTTOM, 100, 10)
   c.restore()
 
   // UI save and restore
