@@ -190,6 +190,15 @@
     <script>
       const cb = Date.now();
       document.write(
+        '<script src="./data/l_Blockers.js?cb=' + cb + '"></' + 'script>'
+      );
+      document.write(
+        '<script src="./data/l_Deaths.js?cb=' + cb + '"></' + 'script>'
+      );
+      document.write(
+        '<script src="./data/l_Illusions.js?cb=' + cb + '"></' + 'script>'
+      );
+      document.write(
         '<script src="./data/l_Gems.js?cb=' + cb + '"></' + 'script>'
       );
       document.write(
@@ -201,6 +210,9 @@
     </script>
     <script src="./js/utils.js"></script>
     <script src="./classes/CollisionBlock.js"></script>
+    <script src="./classes/Blocker.js"></script>
+    <script src="./classes/DeathBlock.js"></script>
+    <script src="./classes/IllusionBlock.js"></script>
     <script src="./classes/Platform.js"></script>
     <script src="./classes/Player.js"></script>
     <script src="./classes/Oposum.js"></script>
