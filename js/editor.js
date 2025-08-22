@@ -155,7 +155,7 @@ document.getElementById('save').addEventListener('click', async () => {
   });
   const statusEl = document.getElementById('save-status');
   try {
-    const res = await fetch('/save', {
+    const res = await fetch('save.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ collisions: floors, gems: gemGrid }),
