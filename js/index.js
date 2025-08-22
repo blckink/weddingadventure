@@ -37,7 +37,7 @@ const tilesets = {
   l_Decorations: { imageUrl: './images/decorations.png', tileSize: 16 },
   l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: 16 },
   l_Shrooms: { imageUrl: './images/decorations.png', tileSize: 16 },
-  l_Collisions: { imageUrl: './images/decorations.png', tileSize: 16 },
+  l_Collisions: { imageUrl: './images/tileset.png', tileSize: 16 },
   l_Grass: { imageUrl: './images/tileset.png', tileSize: 16 },
   l_Trees: { imageUrl: './images/decorations.png', tileSize: 16 },
 }
@@ -71,6 +71,12 @@ extendLevelRight([
   l_Trees,
   l_Gems,
 ])
+
+collisions.forEach((row, y) => {
+  row.forEach((symbol, x) => {
+    l_Collisions[y][x] = symbol === 1 ? 1 : 0
+  })
+})
 
 const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * TILE_SIZE
 
