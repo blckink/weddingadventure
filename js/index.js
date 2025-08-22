@@ -670,5 +670,7 @@ const startRendering = async () => {
   }
 }
 
-init()
-startRendering()
+window.startGame = () => {
+  init()
+  startRendering()
+}
