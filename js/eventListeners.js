@@ -33,3 +33,66 @@ document.addEventListener('visibilitychange', () => {
     lastTime = performance.now()
   }
 })
+
+// Touch controls
+const joystickBase = document.getElementById('joystick-base')
+const joystickKnob = document.getElementById('joystick-knob')
+const actionButton = document.getElementById('action-button')
+
+let joystickPointerId = null
+let startX = 0
+let startY = 0
+const JOYSTICK_RADIUS = 50
+
+if (joystickBase && joystickKnob) {
+  joystickBase.addEventListener('pointerdown', (e) => {
+    joystickPointerId = e.pointerId
+    startX = e.clientX
+    startY = e.clientY
+    joystickKnob.style.transition = '0s'
+  })
+
+  joystickBase.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== joystickPointerId) return
+
+    const dx = e.clientX - startX
+    const dy = e.clientY - startY
+    const clampedX = Math.max(-JOYSTICK_RADIUS, Math.min(JOYSTICK_RADIUS, dx))
+    const clampedY = Math.max(-JOYSTICK_RADIUS, Math.min(JOYSTICK_RADIUS, dy))
+    joystickKnob.style.transform = `translate(${clampedX}px, ${clampedY}px)`
+
+    const normalizedX = clampedX / JOYSTICK_RADIUS
+    const normalizedY = clampedY / JOYSTICK_RADIUS
+
+    keys.a.pressed = normalizedX < -0.3
+    keys.d.pressed = normalizedX > 0.3
+
+    if (normalizedY < -0.5 && !keys.w.pressed) {
+      player.jump()
+      keys.w.pressed = true
+    }
+  })
+
+  const endJoystick = () => {
+    joystickPointerId = null
+    joystickKnob.style.transition = '0.2s'
+    joystickKnob.style.transform = 'translate(0px, 0px)'
+    keys.a.pressed = false
+    keys.d.pressed = false
+    keys.w.pressed = false
+  }
+
+  joystickBase.addEventListener('pointerup', (e) => {
+    if (e.pointerId === joystickPointerId) endJoystick()
+  })
+
+  joystickBase.addEventListener('pointercancel', (e) => {
+    if (e.pointerId === joystickPointerId) endJoystick()
+  })
+}
+
+if (actionButton) {
+  actionButton.addEventListener('pointerdown', () => {
+    player.roll()
+  })
+}
