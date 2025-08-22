@@ -327,4 +327,19 @@ class Player {
     }
     this.isOnGround = false
   }
+
+  snapToGround(collisionBlocks) {
+    const tileSize = 16
+    const groundTileY = Math.floor((this.y + this.height) / tileSize)
+    const groundTileX = Math.floor((this.x + this.width / 2) / tileSize)
+    const block = collisionBlocks.find(
+      (b) => b.x === groundTileX * tileSize && b.y === groundTileY * tileSize,
+    )
+    if (block) {
+      this.y = block.y - this.height
+      this.hitbox.y = this.y + 9
+      this.velocity.y = 0
+      this.isOnGround = true
+    }
+  }
 }

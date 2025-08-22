@@ -108,8 +108,10 @@ function drawGrid() {
 
 function getPos(evt) {
   const rect = canvas.getBoundingClientRect();
-  const x = Math.floor((evt.clientX - rect.left) / tileSize);
-  const y = Math.floor((evt.clientY - rect.top) / tileSize);
+  const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+  const x = Math.floor((clientX - rect.left) / tileSize);
+  const y = Math.floor((clientY - rect.top) / tileSize);
   return { x, y };
 }
 
@@ -122,6 +124,19 @@ canvas.addEventListener('mousemove', (e) => {
   if (drawing) handle(e);
 });
 window.addEventListener('mouseup', () => {
+  drawing = false;
+});
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  drawing = true;
+  handle(e);
+});
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (drawing) handle(e);
+});
+window.addEventListener('touchend', () => {
   drawing = false;
 });
 

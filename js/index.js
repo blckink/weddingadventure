@@ -169,6 +169,7 @@ let player = new Player({
   size: 32,
   velocity: { x: 0, y: 0 },
 })
+player.snapToGround(collisionBlocks)
 
 let oposums = []
 let eagles = []
