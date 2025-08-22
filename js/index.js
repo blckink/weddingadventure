@@ -359,7 +359,7 @@ function init() {
 function animate(backgroundCanvas) {
   // Calculate delta time
   const currentTime = performance.now()
-  const deltaTime = (currentTime - lastTime) / 1000
+  const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1)
   lastTime = currentTime
 
   // Update player position
@@ -540,9 +540,9 @@ function animate(backgroundCanvas) {
 
   // Render scene
   c.save()
+  c.clearRect(0, 0, canvas.width, canvas.height)
   c.scale(dpr + 1, dpr + 1)
   c.translate(-camera.x, -camera.y)
-  c.clearRect(0, 0, canvas.width, canvas.height)
   c.drawImage(oceanBackgroundCanvas, camera.x * 0.32, 0)
   c.drawImage(brambleBackgroundCanvas, camera.x * 0.16, 0)
   c.drawImage(backgroundCanvas, 0, 0)

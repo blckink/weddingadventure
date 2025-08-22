@@ -33,6 +33,11 @@ document.addEventListener('visibilitychange', () => {
   }
 })
 
+// Reset delta time when window regains focus (e.g., after app switching)
+window.addEventListener('focus', () => {
+  lastTime = performance.now()
+})
+
 // Touch controls
 const joystickBase = document.getElementById('joystick-base')
 const joystickKnob = document.getElementById('joystick-knob')
