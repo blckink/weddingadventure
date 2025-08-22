@@ -146,25 +146,25 @@ document.getElementById('toolbar').addEventListener('click', (e) => {
   if (tool) currentTool = tool;
 });
 
-document.getElementById('save').addEventListener('click', () => {
+document.getElementById('save').addEventListener('click', async () => {
   const gemGrid = Array.from({ length: gridHeight }, () =>
     Array(gridWidth).fill(0),
   );
   gems.forEach((g) => {
     gemGrid[g.y][g.x] = 18;
   });
-  const data =
-    `const collisions = ${JSON.stringify(floors)};\n` +
-    `const l_Gems = ${JSON.stringify(gemGrid)};`;
-  document.getElementById('output').value = data;
-
-  const blob = new Blob([data], { type: 'application/javascript' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'map.js';
-  a.click();
-  URL.revokeObjectURL(url);
+  try {
+    const res = await fetch('/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ collisions: floors, gems: gemGrid }),
+    });
+    const text = await res.text();
+    document.getElementById('output').value = text;
+  } catch (err) {
+    console.error(err);
+    document.getElementById('output').value = 'Save failed';
+  }
   localStorage.setItem(
     'editorMap',
     JSON.stringify({ floors, enemies, gems }),
