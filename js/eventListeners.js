@@ -2,7 +2,6 @@ window.addEventListener('keydown', (event) => {
   switch (event.key) {
     case 'w':
       player.jump()
-      keys.w.pressed = true
       break
     case 'a':
       keys.a.pressed = true
@@ -37,7 +36,8 @@ document.addEventListener('visibilitychange', () => {
 // Touch controls
 const joystickBase = document.getElementById('joystick-base')
 const joystickKnob = document.getElementById('joystick-knob')
-const actionButton = document.getElementById('action-button')
+const rollButton = document.getElementById('roll-button')
+const jumpButton = document.getElementById('jump-button')
 
 let joystickPointerId = null
 let startX = 0
@@ -62,15 +62,9 @@ if (joystickBase && joystickKnob) {
     joystickKnob.style.transform = `translate(${clampedX}px, ${clampedY}px)`
 
     const normalizedX = clampedX / JOYSTICK_RADIUS
-    const normalizedY = clampedY / JOYSTICK_RADIUS
 
     keys.a.pressed = normalizedX < -0.3
     keys.d.pressed = normalizedX > 0.3
-
-    if (normalizedY < -0.5 && !keys.w.pressed) {
-      player.jump()
-      keys.w.pressed = true
-    }
   })
 
   const endJoystick = () => {
@@ -79,7 +73,6 @@ if (joystickBase && joystickKnob) {
     joystickKnob.style.transform = 'translate(0px, 0px)'
     keys.a.pressed = false
     keys.d.pressed = false
-    keys.w.pressed = false
   }
 
   joystickBase.addEventListener('pointerup', (e) => {
@@ -91,9 +84,15 @@ if (joystickBase && joystickKnob) {
   })
 }
 
-if (actionButton) {
-  actionButton.addEventListener('pointerdown', () => {
+if (rollButton) {
+  rollButton.addEventListener('pointerdown', () => {
     player.roll()
+  })
+}
+
+if (jumpButton) {
+  jumpButton.addEventListener('pointerdown', () => {
+    player.jump()
   })
 }
 
@@ -121,3 +120,18 @@ document.addEventListener(
 document.addEventListener('gesturestart', (e) => e.preventDefault())
 document.addEventListener('gesturechange', (e) => e.preventDefault())
 document.addEventListener('gestureend', (e) => e.preventDefault())
+
+let lastTouchEnd = 0
+document.addEventListener(
+  'touchend',
+  (e) => {
+    const now = new Date().getTime()
+    if (now - lastTouchEnd <= 300) {
+      e.preventDefault()
+    }
+    lastTouchEnd = now
+  },
+  { passive: false },
+)
+
+document.addEventListener('dblclick', (e) => e.preventDefault())
