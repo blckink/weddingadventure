@@ -163,7 +163,18 @@ const closeModalButton = document.getElementById('close-modal')
 
 const addPressListener = (element, handler) => {
   if (!element) return
-  element.addEventListener('pointerdown', handler)
+
+  const onPress = (e) => {
+    e.preventDefault()
+    handler(e)
+  }
+
+  if (window.PointerEvent) {
+    element.addEventListener('pointerdown', onPress)
+  } else {
+    element.addEventListener('touchstart', onPress)
+  }
+
   element.addEventListener('click', handler)
 }
 
