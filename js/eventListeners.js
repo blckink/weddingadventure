@@ -161,21 +161,21 @@ const codeButton = document.getElementById('code-button')
 const codeModal = document.getElementById('code-modal')
 const closeModalButton = document.getElementById('close-modal')
 
-if (startButton) {
-  startButton.addEventListener('click', () => {
-    if (startScreen) startScreen.style.display = 'none'
-    if (typeof startGame === 'function') startGame()
-  })
+const addPressListener = (element, handler) => {
+  if (!element) return
+  element.addEventListener('pointerdown', handler)
+  element.addEventListener('click', handler)
 }
 
-if (codeButton) {
-  codeButton.addEventListener('click', () => {
-    if (codeModal) codeModal.classList.remove('hidden')
-  })
-}
+addPressListener(startButton, () => {
+  if (startScreen) startScreen.style.display = 'none'
+  if (typeof startGame === 'function') startGame()
+})
 
-if (closeModalButton) {
-  closeModalButton.addEventListener('click', () => {
-    if (codeModal) codeModal.classList.add('hidden')
-  })
-}
+addPressListener(codeButton, () => {
+  if (codeModal) codeModal.classList.remove('hidden')
+})
+
+addPressListener(closeModalButton, () => {
+  if (codeModal) codeModal.classList.add('hidden')
+})
