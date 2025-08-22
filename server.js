@@ -21,11 +21,17 @@ const server = http.createServer((req, res) => {
           path.join(baseDir, 'data', 'l_Gems.js'),
           `const l_Gems = ${JSON.stringify(gems)};`
         );
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-store',
+        });
         res.end('Saved');
       } catch (err) {
         console.error(err);
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.writeHead(500, {
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-store',
+        });
         res.end('Error saving');
       }
     });
@@ -36,10 +42,13 @@ const server = http.createServer((req, res) => {
     );
     fs.readFile(filePath, (err, content) => {
       if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.writeHead(404, {
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-store',
+        });
         res.end('Not found');
       } else {
-        res.writeHead(200);
+        res.writeHead(200, { 'Cache-Control': 'no-store' });
         res.end(content);
       }
     });
