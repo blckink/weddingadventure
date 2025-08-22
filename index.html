@@ -1,46 +1,62 @@
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font: inherit;
-    vertical-align: baseline;
-  }
-  body {
-    background: black;
-    margin: 0;
-  }
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font: inherit;
+        vertical-align: baseline;
+      }
 
-  canvas {
-    width: 1024px;
-    height: 576px;
-  }
-</style>
-<canvas style="image-rendering: pixelated"></canvas>
-<p style="color: white; font-family: sans-serif; margin: 8px">
-  WASD to move, Spacebar to roll / attack
-</p>
-<script src="./data/l_New_Layer_1.js"></script>
-<script src="./data/l_New_Layer_2.js"></script>
-<script src="./data/l_New_Layer_8.js"></script>
-<script src="./data/l_Back_Tiles.js"></script>
-<script src="./data/l_Decorations.js"></script>
-<script src="./data/l_Front_Tiles.js"></script>
-<script src="./data/l_Shrooms.js"></script>
-<script src="./data/l_Collisions.js"></script>
-<script src="./data/l_Grass.js"></script>
-<script src="./data/l_Trees.js"></script>
-<script src="./data/l_Gems.js"></script>
-<script src="./data/collisions.js"></script>
-<script src="./js/utils.js"></script>
-<script src="./classes/CollisionBlock.js"></script>
-<script src="./classes/Platform.js"></script>
-<script src="./classes/Player.js"></script>
-<script src="./classes/Oposum.js"></script>
-<script src="./classes/Eagle.js"></script>
-<script src="./classes/Sprite.js"></script>
-<script src="./classes/Heart.js"></script>
+      html,
+      body {
+        height: 100%;
+        background: black;
+        overflow: hidden;
+      }
 
-<script src="./js/index.js"></script>
-<script src="./js/eventListeners.js"></script>
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas style="image-rendering: pixelated"></canvas>
+    <p style="color: white; font-family: sans-serif; margin: 8px">
+      WASD to move, Spacebar to roll / attack
+    </p>
+    <script src="./data/l_New_Layer_1.js"></script>
+    <script src="./data/l_New_Layer_2.js"></script>
+    <script src="./data/l_New_Layer_8.js"></script>
+    <script src="./data/l_Back_Tiles.js"></script>
+    <script src="./data/l_Decorations.js"></script>
+    <script src="./data/l_Front_Tiles.js"></script>
+    <script src="./data/l_Shrooms.js"></script>
+    <script src="./data/l_Collisions.js"></script>
+    <script src="./data/l_Grass.js"></script>
+    <script src="./data/l_Trees.js"></script>
+    <script src="./data/l_Gems.js"></script>
+    <script src="./data/collisions.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./classes/CollisionBlock.js"></script>
+    <script src="./classes/Platform.js"></script>
+    <script src="./classes/Player.js"></script>
+    <script src="./classes/Oposum.js"></script>
+    <script src="./classes/Eagle.js"></script>
+    <script src="./classes/Sprite.js"></script>
+    <script src="./classes/Heart.js"></script>
+
+    <script src="./js/index.js"></script>
+    <script src="./js/eventListeners.js"></script>
+  </body>
+</html>

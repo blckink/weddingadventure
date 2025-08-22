@@ -1,9 +1,14 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
-const dpr = 2
+const dpr = window.devicePixelRatio || 1
 
-canvas.width = 1024 * dpr
-canvas.height = 576 * dpr
+function resizeCanvas() {
+  canvas.width = window.innerWidth * dpr
+  canvas.height = window.innerHeight * dpr
+}
+
+resizeCanvas()
+window.addEventListener('resize', resizeCanvas)
 
 const oceanLayerData = {
   l_New_Layer_1: l_New_Layer_1,
