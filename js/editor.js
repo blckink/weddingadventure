@@ -2,12 +2,32 @@ const canvas = document.getElementById('editor');
 const ctx = canvas.getContext('2d');
 
 const tileSize = 32;
-const gridWidth = canvas.width / tileSize;
-const gridHeight = canvas.height / tileSize;
-
-let floors = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(0));
+let gridWidth;
+let gridHeight;
+let floors;
 let enemies = [];
 let gems = [];
+
+if (typeof collisions !== 'undefined') {
+  gridHeight = collisions.length;
+  gridWidth = collisions[0].length;
+  floors = collisions.map((row) => row.map((cell) => (cell ? 1 : 0)));
+  canvas.width = gridWidth * tileSize;
+  canvas.height = gridHeight * tileSize;
+} else {
+  gridWidth = canvas.width / tileSize;
+  gridHeight = canvas.height / tileSize;
+  floors = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(0));
+}
+
+if (typeof l_Gems !== 'undefined') {
+  l_Gems.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      if (cell) gems.push({ x, y });
+    });
+  });
+}
+
 const defaultState = JSON.parse(JSON.stringify({ floors, enemies, gems }));
 let floorImg;
 let enemyImg;
@@ -36,6 +56,10 @@ Promise.all([
     floors = parsed.floors;
     enemies = parsed.enemies;
     gems = parsed.gems;
+    gridHeight = floors.length;
+    gridWidth = floors[0].length;
+    canvas.width = gridWidth * tileSize;
+    canvas.height = gridHeight * tileSize;
   }
   drawGrid();
 });
@@ -123,17 +147,28 @@ document.getElementById('toolbar').addEventListener('click', (e) => {
 });
 
 document.getElementById('save').addEventListener('click', () => {
-  const data = JSON.stringify({ floors, enemies, gems }, null, 2);
+  const gemGrid = Array.from({ length: gridHeight }, () =>
+    Array(gridWidth).fill(0),
+  );
+  gems.forEach((g) => {
+    gemGrid[g.y][g.x] = 18;
+  });
+  const data =
+    `const collisions = ${JSON.stringify(floors)};\n` +
+    `const l_Gems = ${JSON.stringify(gemGrid)};`;
   document.getElementById('output').value = data;
 
-  const blob = new Blob([data], { type: 'application/json' });
+  const blob = new Blob([data], { type: 'application/javascript' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'map.json';
+  a.download = 'map.js';
   a.click();
   URL.revokeObjectURL(url);
-  localStorage.setItem('editorMap', data);
+  localStorage.setItem(
+    'editorMap',
+    JSON.stringify({ floors, enemies, gems }),
+  );
 });
 
 document.getElementById('reset').addEventListener('click', () => {
@@ -142,5 +177,18 @@ document.getElementById('reset').addEventListener('click', () => {
   enemies = state.enemies;
   gems = state.gems;
   localStorage.removeItem('editorMap');
+  gridHeight = floors.length;
+  gridWidth = floors[0].length;
+  canvas.width = gridWidth * tileSize;
+  canvas.height = gridHeight * tileSize;
+  drawGrid();
+});
+
+document.getElementById('extend').addEventListener('click', () => {
+  const cols = parseInt(prompt('Columns to add?', '10'), 10);
+  if (!cols) return;
+  floors.forEach((row) => row.push(...Array(cols).fill(0)));
+  gridWidth += cols;
+  canvas.width = gridWidth * tileSize;
   drawGrid();
 });
