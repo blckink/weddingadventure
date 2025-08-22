@@ -103,16 +103,30 @@ if (jumpButton) {
 
 const fullscreenButton = document.getElementById('fullscreen-button')
 if (fullscreenButton) {
-  fullscreenButton.addEventListener('click', () => {
+  const toggleFullscreen = () => {
     const elem = document.documentElement
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen()
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen()
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen()
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen()
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen()
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen()
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen()
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen()
+      }
     }
-  })
+  }
+
+  fullscreenButton.addEventListener('click', toggleFullscreen)
+  fullscreenButton.addEventListener('touchend', toggleFullscreen)
 }
 
 document.addEventListener(
