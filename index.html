@@ -114,8 +114,15 @@
     <script src="./data/l_Collisions.js"></script>
     <script src="./data/l_Grass.js"></script>
     <script src="./data/l_Trees.js"></script>
-    <script src="./data/l_Gems.js"></script>
-    <script src="./data/collisions.js"></script>
+    <script>
+      const cb = Date.now();
+      document.write(
+        '<script src="./data/l_Gems.js?cb=' + cb + '"></' + 'script>'
+      );
+      document.write(
+        '<script src="./data/collisions.js?cb=' + cb + '"></' + 'script>'
+      );
+    </script>
     <script src="./js/utils.js"></script>
     <script src="./classes/CollisionBlock.js"></script>
     <script src="./classes/Platform.js"></script>
