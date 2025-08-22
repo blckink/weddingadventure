@@ -48,7 +48,10 @@ const LEVEL_EXTENSION_COLUMNS = 20
 function extendLevelRight(layerArrays, extraColumns = LEVEL_EXTENSION_COLUMNS) {
   layerArrays.forEach((layer) => {
     layer.forEach((row) => {
-      const extension = row.slice(-extraColumns)
+      // Duplicate the first columns instead of the last ones to
+      // avoid repeating the level's boundary and creating an
+      // impassable wall when extending the map.
+      const extension = row.slice(0, extraColumns)
       row.push(...extension)
     })
   })
