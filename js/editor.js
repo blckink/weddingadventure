@@ -7,17 +7,41 @@ let gridHeight;
 let floors;
 let enemies = [];
 let gems = [];
+let blockers;
+let deaths;
+let illusions;
 
 if (typeof collisions !== 'undefined') {
   gridHeight = collisions.length;
   gridWidth = collisions[0].length;
   floors = collisions.map((row) => row.map((cell) => (cell ? 1 : 0)));
+  blockers =
+    typeof l_Blockers !== 'undefined' && l_Blockers.length
+      ? l_Blockers
+      : collisions.map((row) => row.map(() => 0));
+  deaths =
+    typeof l_Deaths !== 'undefined' && l_Deaths.length
+      ? l_Deaths
+      : collisions.map((row) => row.map(() => 0));
+  illusions =
+    typeof l_Illusions !== 'undefined' && l_Illusions.length
+      ? l_Illusions
+      : collisions.map((row) => row.map(() => 0));
   canvas.width = gridWidth * tileSize;
   canvas.height = gridHeight * tileSize;
 } else {
   gridWidth = canvas.width / tileSize;
   gridHeight = canvas.height / tileSize;
   floors = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(0));
+  blockers = Array.from({ length: gridHeight }, () =>
+    Array(gridWidth).fill(0),
+  );
+  deaths = Array.from({ length: gridHeight }, () =>
+    Array(gridWidth).fill(0),
+  );
+  illusions = Array.from({ length: gridHeight }, () =>
+    Array(gridWidth).fill(0),
+  );
 }
 
 if (typeof l_Gems !== 'undefined') {
@@ -37,7 +61,9 @@ if (typeof l_Enemies !== 'undefined') {
   });
 }
 
-const defaultState = JSON.parse(JSON.stringify({ floors, enemies, gems }));
+const defaultState = JSON.parse(
+  JSON.stringify({ floors, enemies, gems, blockers, deaths, illusions }),
+);
 let floorImg;
 const enemyImgs = {};
 let gemImg;
@@ -67,6 +93,9 @@ Promise.all([
     floors = parsed.floors;
     enemies = parsed.enemies || [];
     gems = parsed.gems || [];
+    blockers = parsed.blockers || blockers;
+    deaths = parsed.deaths || deaths;
+    illusions = parsed.illusions || illusions;
     gridHeight = floors.length;
     gridWidth = floors[0].length;
     canvas.width = gridWidth * tileSize;
@@ -93,6 +122,18 @@ function drawGrid() {
           tileSize,
           tileSize,
         );
+      }
+      if (blockers[y][x]) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+      }
+      if (deaths[y][x]) {
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+      }
+      if (illusions[y][x]) {
+        ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
       }
       ctx.strokeStyle = '#444';
       ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
@@ -155,6 +196,12 @@ function handle(evt) {
 
   if (currentTool === 'floor') {
     floors[y][x] = 1;
+  } else if (currentTool === 'blocker') {
+    blockers[y][x] = 1;
+  } else if (currentTool === 'death') {
+    deaths[y][x] = 1;
+  } else if (currentTool === 'illusion') {
+    illusions[y][x] = 1;
   } else if (currentTool.startsWith('enemy-')) {
     const type = currentTool.split('-')[1];
     if (!enemies.some((e) => e.x === x && e.y === y)) enemies.push({ x, y, type });
@@ -162,6 +209,9 @@ function handle(evt) {
     if (!gems.some((g) => g.x === x && g.y === y)) gems.push({ x, y });
   } else if (currentTool === 'erase') {
     floors[y][x] = 0;
+    blockers[y][x] = 0;
+    deaths[y][x] = 0;
+    illusions[y][x] = 0;
     enemies = enemies.filter((e) => !(e.x === x && e.y === y));
     gems = gems.filter((g) => !(g.x === x && g.y === y));
   }
@@ -192,7 +242,14 @@ document.getElementById('save').addEventListener('click', async () => {
     const res = await fetch('save.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ collisions: floors, gems: gemGrid, enemies: enemyGrid }),
+      body: JSON.stringify({
+        collisions: floors,
+        gems: gemGrid,
+        enemies: enemyGrid,
+        blockers,
+        deaths,
+        illusions,
+      }),
       cache: 'no-store',
     });
     if (!res.ok) throw new Error('Save failed');
@@ -208,7 +265,7 @@ document.getElementById('save').addEventListener('click', async () => {
   }
   localStorage.setItem(
     'editorMap',
-    JSON.stringify({ floors, enemies, gems }),
+    JSON.stringify({ floors, enemies, gems, blockers, deaths, illusions }),
   );
 });
 
@@ -217,6 +274,9 @@ document.getElementById('reset').addEventListener('click', () => {
   floors = state.floors;
   enemies = state.enemies;
   gems = state.gems;
+  blockers = state.blockers;
+  deaths = state.deaths;
+  illusions = state.illusions;
   localStorage.removeItem('editorMap');
   gridHeight = floors.length;
   gridWidth = floors[0].length;
@@ -229,6 +289,9 @@ document.getElementById('extend').addEventListener('click', () => {
   const cols = parseInt(prompt('Columns to add?', '10'), 10);
   if (!cols) return;
   floors.forEach((row) => row.push(...Array(cols).fill(0)));
+  blockers.forEach((row) => row.push(...Array(cols).fill(0)));
+  deaths.forEach((row) => row.push(...Array(cols).fill(0)));
+  illusions.forEach((row) => row.push(...Array(cols).fill(0)));
   gridWidth += cols;
   canvas.width = gridWidth * tileSize;
   drawGrid();

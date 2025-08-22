@@ -45,6 +45,19 @@ const tilesets = {
 const TILE_SIZE = 16
 const LEVEL_EXTENSION_COLUMNS = 20
 
+const blockers =
+  typeof l_Blockers !== 'undefined' && l_Blockers.length
+    ? l_Blockers
+    : collisions.map((row) => row.map(() => 0))
+const deaths =
+  typeof l_Deaths !== 'undefined' && l_Deaths.length
+    ? l_Deaths
+    : collisions.map((row) => row.map(() => 0))
+const illusions =
+  typeof l_Illusions !== 'undefined' && l_Illusions.length
+    ? l_Illusions
+    : collisions.map((row) => row.map(() => 0))
+
 function extendLevelRight(layerArrays, extraColumns = LEVEL_EXTENSION_COLUMNS) {
   layerArrays.forEach((layer) => {
     layer.forEach((row) => {
@@ -71,6 +84,9 @@ extendLevelRight([
   l_Trees,
   l_Gems,
   l_Enemies,
+  blockers,
+  deaths,
+  illusions,
 ])
 
 collisions.forEach((row, y) => {
@@ -88,11 +104,29 @@ const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * TILE_SIZE
 // Tile setup
 const collisionBlocks = []
 const platforms = []
+const deathBlocks = []
+const illusionBlocks = []
 const blockSize = TILE_SIZE // Assuming each tile is 16x16 pixels
+
+const illusionPositions = new Set()
+illusions.forEach((row, y) => {
+  row.forEach((symbol, x) => {
+    if (symbol === 1) {
+      illusionBlocks.push(
+        new IllusionBlock({
+          x: x * blockSize,
+          y: y * blockSize,
+          size: blockSize,
+        }),
+      )
+      illusionPositions.add(`${x},${y}`)
+    }
+  })
+})
 
 collisions.forEach((row, y) => {
   row.forEach((symbol, x) => {
-    if (symbol === 1) {
+    if (symbol === 1 && !illusionPositions.has(`${x},${y}`)) {
       collisionBlocks.push(
         new CollisionBlock({
           x: x * blockSize,
@@ -100,13 +134,41 @@ collisions.forEach((row, y) => {
           size: blockSize,
         }),
       )
-    } else if (symbol === 2) {
+    } else if (symbol === 2 && !illusionPositions.has(`${x},${y}`)) {
       platforms.push(
         new Platform({
           x: x * blockSize,
           y: y * blockSize + blockSize,
           width: 16,
           height: 4,
+        }),
+      )
+    }
+  })
+})
+
+blockers.forEach((row, y) => {
+  row.forEach((symbol, x) => {
+    if (symbol === 1 && !illusionPositions.has(`${x},${y}`)) {
+      collisionBlocks.push(
+        new Blocker({
+          x: x * blockSize,
+          y: y * blockSize,
+          size: blockSize,
+        }),
+      )
+    }
+  })
+})
+
+deaths.forEach((row, y) => {
+  row.forEach((symbol, x) => {
+    if (symbol === 1 && !illusionPositions.has(`${x},${y}`)) {
+      deathBlocks.push(
+        new DeathBlock({
+          x: x * blockSize,
+          y: y * blockSize,
+          size: blockSize,
         }),
       )
     }
@@ -589,6 +651,20 @@ function animate(backgroundCanvas) {
       if (gems.length === 0) {
         console.log('YOU WIN!')
       }
+    }
+  }
+
+  for (let i = 0; i < deathBlocks.length; i++) {
+    const block = deathBlocks[i]
+    if (
+      player.hitbox.x <= block.x + block.width &&
+      player.hitbox.x + player.hitbox.width >= block.x &&
+      player.hitbox.y <= block.y + block.height &&
+      player.hitbox.y + player.hitbox.height >= block.y
+    ) {
+      hearts.forEach((heart) => (heart.depleted = true))
+      init()
+      break
     }
   }
 

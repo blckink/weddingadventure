@@ -36,6 +36,9 @@
     <button data-tool="enemy-oposum">Oposum</button>
     <button data-tool="enemy-eagle">Eagle</button>
     <button data-tool="gem">Gem</button>
+    <button data-tool="blocker">Blocker</button>
+    <button data-tool="death">Death</button>
+    <button data-tool="illusion">Illusion</button>
     <button data-tool="erase">Erase</button>
     <button id="save">Save</button>
     <button id="reset">Reset</button>
@@ -54,6 +57,15 @@
     );
     document.write(
       '<script src="./data/l_Enemies.js?cb=' + cb + '"></' + 'script>'
+    );
+    document.write(
+      '<script src="./data/l_Blockers.js?cb=' + cb + '"></' + 'script>'
+    );
+    document.write(
+      '<script src="./data/l_Deaths.js?cb=' + cb + '"></' + 'script>'
+    );
+    document.write(
+      '<script src="./data/l_Illusions.js?cb=' + cb + '"></' + 'script>'
     );
   </script>
   <script src="js/editor.js"></script>
