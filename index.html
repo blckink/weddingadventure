@@ -56,9 +56,20 @@
         transition: transform 0.2s ease;
       }
 
-      #action-button {
+      #roll-button {
         position: absolute;
         bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        touch-action: none;
+      }
+
+      #jump-button {
+        position: absolute;
+        bottom: 100px;
         right: 20px;
         width: 60px;
         height: 60px;
@@ -84,13 +95,14 @@
   <body>
     <canvas style="image-rendering: pixelated"></canvas>
     <p style="color: white; font-family: sans-serif; margin: 8px">
-      WASD to move, Spacebar to roll / attack. Drag left circle or tap right
-      button on touch devices.
+      WASD to move, Spacebar to roll / attack. Drag left circle to move and use
+      right buttons on touch devices.
     </p>
     <div id="joystick-base">
       <div id="joystick-knob"></div>
     </div>
-    <div id="action-button"></div>
+    <div id="roll-button"></div>
+    <div id="jump-button"></div>
     <button id="fullscreen-button">⛶</button>
     <script src="./data/l_New_Layer_1.js"></script>
     <script src="./data/l_New_Layer_2.js"></script>
