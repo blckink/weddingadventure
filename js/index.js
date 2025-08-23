@@ -1,6 +1,7 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 const dpr = window.devicePixelRatio || 1
+const winScreen = document.getElementById('win-screen')
 
 function resizeCanvas() {
   canvas.width = window.innerWidth * dpr
@@ -720,7 +721,7 @@ function animate(backgroundCanvas) {
       gemCount++
 
       if (gems.length === 0) {
-        console.log('YOU WIN!')
+        if (winScreen) winScreen.classList.remove('hidden')
       }
     }
   }
