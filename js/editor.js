@@ -202,13 +202,19 @@ window.addEventListener('mouseup', () => {
 });
 
 canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  drawing = true;
-  handle(e);
+  if (e.touches.length === 1) {
+    e.preventDefault();
+    drawing = true;
+    handle(e);
+  } else {
+    drawing = false;
+  }
 });
 canvas.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  if (drawing) handle(e);
+  if (drawing && e.touches.length === 1) {
+    e.preventDefault();
+    handle(e);
+  }
 });
 window.addEventListener('touchend', () => {
   drawing = false;
