@@ -114,16 +114,18 @@ class Player {
         c.globalAlpha = 1
       }
       c.scale(xScale, 1)
+      const cropTop = 1
+      const scaledCrop = Math.round(cropTop * this.scale)
       c.drawImage(
         this.image,
         this.currentSprite.x + this.currentSprite.width * this.currentFrame,
-        this.currentSprite.y,
+        this.currentSprite.y + cropTop,
         this.currentSprite.width,
-        this.currentSprite.height,
+        this.currentSprite.height - cropTop,
         drawX,
-        drawY,
+        drawY + scaledCrop,
         Math.round(this.width),
-        Math.round(this.height)
+        Math.round(this.height - scaledCrop)
       )
       c.restore()
     }
