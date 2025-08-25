@@ -18,23 +18,17 @@
       body {
         margin: 0;
         padding: 0;
+        height: 100%;
         background: #000;
+        overflow: hidden;
         overscroll-behavior: none;
         touch-action: none;
       }
 
-      #game-root {
-        width: 100vw;
-        height: 100svh;
-        position: fixed;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        background: #000;
-      }
-
       canvas {
         display: block;
+        width: 100vw;
+        height: 100vh;
         image-rendering: pixelated;
       }
 
@@ -181,9 +175,7 @@
       </div>
     </div>
     <div id="win-screen" class="hidden">YOU WIN!</div>
-    <div id="game-root">
-      <canvas id="game"></canvas>
-    </div>
+    <canvas id="game"></canvas>
     <button id="fs-btn">⛶</button>
     <div id="touch-ui">
       <div id="dpad"></div>

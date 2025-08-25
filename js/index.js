@@ -178,13 +178,6 @@ const l_Filler = createFillerLayer(collisions)
 layersData.l_Filler = l_Filler
 tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILESIZE_SRC }
 
-const levelBounds = {
-  x: 0,
-  y: 0,
-  w: collisions[0].length * TILESIZE_LOGIC,
-  h: collisions.length * TILESIZE_LOGIC,
-}
-
 const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * tile_on_screen_px
 
 // Tile setup
@@ -760,7 +753,7 @@ function animate(backgroundCanvas) {
   }
 
   // Update and apply camera
-  updateCamera(player, levelBounds)
+  updateCamera(player)
 
   // Render scene
   c.save()
