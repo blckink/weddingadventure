@@ -679,7 +679,7 @@ function animate(backgroundCanvas) {
   // Center camera on player
   camera.x = Math.max(
     0,
-    player.x - canvas.width / (2 * dpr * GAME_SCALE)
+    player.x + player.width / 2 - canvas.width / (2 * dpr * GAME_SCALE)
   )
   camera.y = Math.max(
     0,
