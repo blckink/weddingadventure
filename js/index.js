@@ -8,6 +8,9 @@ const winScreen = document.getElementById('win-screen')
 function resizeCanvas() {
   canvas.width = window.innerWidth * dpr
   canvas.height = window.innerHeight * dpr
+  // Ensure CSS size matches the drawing buffer to avoid aspect ratio distortions
+  canvas.style.width = `${window.innerWidth}px`
+  canvas.style.height = `${window.innerHeight}px`
 }
 
 resizeCanvas()
