@@ -773,9 +773,22 @@ function animate(backgroundCanvas) {
     }
   }
 
-  // Center camera on player
-  camera.x = Math.max(0, player.x - canvas.width / (2 * dpr))
-  camera.y = Math.max(0, player.y - canvas.height / (2 * dpr))
+  // Center camera on player and clamp to level bounds
+  const viewportWidth = canvas.width / dpr
+  const viewportHeight = canvas.height / dpr
+  const levelWidth = collisions[0].length * tile_on_screen_px
+  const levelHeight = collisions.length * tile_on_screen_px
+
+  camera.x = player.x - viewportWidth / 2
+  camera.y = player.y - viewportHeight / 2
+
+  const maxCamX = levelWidth - viewportWidth
+  const maxCamY = levelHeight - viewportHeight
+
+  camera.x =
+    maxCamX < 0 ? maxCamX / 2 : Math.max(0, Math.min(camera.x, maxCamX))
+  camera.y =
+    maxCamY < 0 ? maxCamY / 2 : Math.max(0, Math.min(camera.y, maxCamY))
 
   // Render scene
   c.save()
