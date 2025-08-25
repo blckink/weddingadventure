@@ -2,6 +2,7 @@ const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 c.imageSmoothingEnabled = false
 const dpr = window.devicePixelRatio || 1
+const GAME_SCALE = 1.5
 const winScreen = document.getElementById('win-screen')
 
 function resizeCanvas() {
@@ -678,17 +679,17 @@ function animate(backgroundCanvas) {
   // Center camera on player
   camera.x = Math.max(
     0,
-    player.x - canvas.width / (2 * (dpr + 1))
+    player.x - canvas.width / (2 * dpr * GAME_SCALE)
   )
   camera.y = Math.max(
     0,
-    player.y - canvas.height / (2 * (dpr + 1))
+    player.y - canvas.height / (2 * dpr * GAME_SCALE)
   )
 
   // Render scene
   c.save()
   c.clearRect(0, 0, canvas.width, canvas.height)
-  c.scale(dpr + 1, dpr + 1)
+  c.scale(dpr * GAME_SCALE, dpr * GAME_SCALE)
   const camX = Math.round(camera.x)
   const camY = Math.round(camera.y)
   c.translate(-camX, -camY)
@@ -724,7 +725,7 @@ function animate(backgroundCanvas) {
 
   // UI save and restore
   c.save()
-  c.scale(dpr + 1, dpr + 1)
+  c.scale(dpr * GAME_SCALE, dpr * GAME_SCALE)
   for (let i = hearts.length - 1; i >= 0; i--) {
     const heart = hearts[i]
     heart.draw(c)
