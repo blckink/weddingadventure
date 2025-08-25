@@ -15,7 +15,9 @@ let illusions;
 if (typeof collisions !== 'undefined') {
   gridHeight = collisions.length;
   gridWidth = collisions[0].length;
-  floors = collisions.map((row) => row.map((cell) => (cell ? 1 : 0)));
+  floors = collisions.map((row) =>
+    row.map((cell) => (cell ? 'solid_mass' : 'air')),
+  );
   blockers =
     typeof l_Blockers !== 'undefined' && l_Blockers.length
       ? l_Blockers
@@ -33,7 +35,9 @@ if (typeof collisions !== 'undefined') {
 } else {
   gridWidth = canvas.width / tileSize;
   gridHeight = canvas.height / tileSize;
-  floors = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(0));
+  floors = Array.from({ length: gridHeight }, () =>
+    Array(gridWidth).fill('air'),
+  );
   blockers = Array.from({ length: gridHeight }, () =>
     Array(gridWidth).fill(0),
   );
@@ -65,7 +69,6 @@ if (typeof l_Enemies !== 'undefined') {
 const defaultState = JSON.parse(
   JSON.stringify({ floors, enemies, gems, blockers, deaths, illusions }),
 );
-let floorImg;
 const enemyImgs = {};
 let gemImg;
 
@@ -79,12 +82,11 @@ function loadImage(src) {
 }
 
 Promise.all([
-  loadImage('./images/tileset.png'),
+  loadImage('./images/floor.png'),
   loadImage('./images/oposum.png'),
   loadImage('./images/eagle.png'),
   loadImage('./images/gem.png'),
-]).then(([tile, oposum, eagle, gem]) => {
-  floorImg = tile;
+]).then(([_, oposum, eagle, gem]) => {
   enemyImgs.oposum = oposum;
   enemyImgs.eagle = eagle;
   gemImg = gem;
@@ -102,22 +104,63 @@ Promise.all([
     canvas.width = gridWidth * tileSize;
     canvas.height = gridHeight * tileSize;
   }
+  setupPalette();
   drawGrid();
 });
 let currentTool = 'floor';
+let currentFloorType = 'solid_mass';
+
+function setupPalette() {
+  const palette = document.getElementById('palette');
+  palette.innerHTML = '';
+  const mapping = {
+    grass_top: 'grass_mid',
+    solid_mass: 'mass_plain',
+    overhang: 'grass_overhang_mid',
+  };
+  FloorTiles.LOGICAL_TYPES.forEach((type) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const pctx = canvas.getContext('2d');
+    const tileName = mapping[type] || 'mass_plain';
+    const pos = FloorTiles.FLOOR_TILES[tileName];
+    pctx.imageSmoothingEnabled = false;
+    pctx.drawImage(
+      FloorTiles.floorAtlas,
+      (pos.c - 1) * FloorTiles.SRC_TILE,
+      (pos.r - 1) * FloorTiles.SRC_TILE,
+      FloorTiles.SRC_TILE,
+      FloorTiles.SRC_TILE,
+      0,
+      0,
+      32,
+      32,
+    );
+    canvas.addEventListener('click', () => {
+      currentTool = 'floor';
+      currentFloorType = type;
+    });
+    palette.appendChild(canvas);
+  });
+}
 
 function drawGrid() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
-      if (floors[y][x]) {
+      const name = FloorTiles.autotile(floors, x, y);
+      if (name) {
+        const pos = FloorTiles.FLOOR_TILES[name];
+        const sx = (pos.c - 1) * FloorTiles.SRC_TILE;
+        const sy = (pos.r - 1) * FloorTiles.SRC_TILE;
         ctx.drawImage(
-          floorImg,
-          0,
-          0,
-          16,
-          16,
+          FloorTiles.floorAtlas,
+          sx,
+          sy,
+          FloorTiles.SRC_TILE,
+          FloorTiles.SRC_TILE,
           x * tileSize,
           y * tileSize,
           tileSize,
@@ -159,10 +202,12 @@ function drawGrid() {
 
 function getPos(evt) {
   const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
   const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
   const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
-  const x = Math.floor((clientX - rect.left) / tileSize);
-  const y = Math.floor((clientY - rect.top) / tileSize);
+  const x = Math.floor(((clientX - rect.left) * scaleX) / tileSize);
+  const y = Math.floor(((clientY - rect.top) * scaleY) / tileSize);
   return { x, y };
 }
 
@@ -196,7 +241,7 @@ function handle(evt) {
   if (x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
 
   if (currentTool === 'floor') {
-    floors[y][x] = 1;
+    floors[y][x] = currentFloorType;
   } else if (currentTool === 'blocker') {
     blockers[y][x] = 1;
   } else if (currentTool === 'death') {
@@ -209,7 +254,7 @@ function handle(evt) {
   } else if (currentTool === 'gem') {
     if (!gems.some((g) => g.x === x && g.y === y)) gems.push({ x, y });
   } else if (currentTool === 'erase') {
-    floors[y][x] = 0;
+    floors[y][x] = 'air';
     blockers[y][x] = 0;
     deaths[y][x] = 0;
     illusions[y][x] = 0;
@@ -244,7 +289,9 @@ document.getElementById('save').addEventListener('click', async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        collisions: floors,
+        collisions: floors.map((row) =>
+          row.map((cell) => (cell === 'air' ? 0 : 1)),
+        ),
         gems: gemGrid,
         enemies: enemyGrid,
         blockers,
@@ -289,7 +336,7 @@ document.getElementById('reset').addEventListener('click', () => {
 document.getElementById('extend').addEventListener('click', () => {
   const cols = parseInt(prompt('Columns to add?', '10'), 10);
   if (!cols) return;
-  floors.forEach((row) => row.push(...Array(cols).fill(0)));
+  floors.forEach((row) => row.push(...Array(cols).fill('air')));
   blockers.forEach((row) => row.push(...Array(cols).fill(0)));
   deaths.forEach((row) => row.push(...Array(cols).fill(0)));
   illusions.forEach((row) => row.push(...Array(cols).fill(0)));
