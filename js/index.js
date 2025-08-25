@@ -12,14 +12,6 @@ function resizeCanvas() {
 resizeCanvas()
 window.addEventListener('resize', resizeCanvas)
 
-const oceanLayerData = {
-  l_New_Layer_1: l_New_Layer_1,
-}
-
-const brambleLayerData = {
-  l_New_Layer_2: l_New_Layer_2,
-}
-
 const layersData = {
   l_New_Layer_8: l_New_Layer_8,
   l_Back_Tiles: l_Back_Tiles,
@@ -32,8 +24,6 @@ const layersData = {
 }
 
 const tilesets = {
-  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
-  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
   l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
   l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
   l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
@@ -389,8 +379,14 @@ let camera = {
   y: 0,
 }
 
-let oceanBackgroundCanvas = null
-let brambleBackgroundCanvas = null
+const parallaxBackgrounds = [
+  { src: './images/bg-5.png', factor: 0.9 },
+  { src: './images/bg-4.png', factor: 0.75 },
+  { src: './images/bg-3.png', factor: 0.5 },
+  { src: './images/bg-2.png', factor: 0.25 },
+  { src: './images/bg-1.png', factor: 0.1 },
+]
+
 let gems = []
 let gemUI = new Sprite({
   x: 13,
@@ -770,8 +766,11 @@ function animate(backgroundCanvas) {
   const camX = Math.round(camera.x)
   const camY = Math.round(camera.y)
   c.translate(-camX, -camY)
-  c.drawImage(oceanBackgroundCanvas, Math.round(camX * 0.32), 0)
-  c.drawImage(brambleBackgroundCanvas, Math.round(camX * 0.16), 0)
+  parallaxBackgrounds.forEach((layer) => {
+    if (layer.image) {
+      c.drawImage(layer.image, Math.round(camX * layer.factor), 0)
+    }
+  })
   c.drawImage(backgroundCanvas, 0, 0)
   player.draw(c)
 
@@ -814,8 +813,9 @@ function animate(backgroundCanvas) {
 
 const startRendering = async () => {
   try {
-    oceanBackgroundCanvas = await renderStaticLayers(oceanLayerData)
-    brambleBackgroundCanvas = await renderStaticLayers(brambleLayerData)
+    for (const layer of parallaxBackgrounds) {
+      layer.image = await loadImage(layer.src)
+    }
     const backgroundCanvas = await renderStaticLayers(layersData)
     if (!backgroundCanvas) {
       console.error('Failed to create the background canvas')
