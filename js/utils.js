@@ -1,16 +1,7 @@
 // Global sizing constants
-// Logical world size (16:9 retro base)
-const WORLD_BASE_W = 320
-const WORLD_BASE_H = 180
-// Tile sizes
-const TILESIZE_LOGIC = 16
-const TILESIZE_SRC = 32
-// Preserve old constant name for backwards compatibility
-const TILE_NATIVE = TILESIZE_LOGIC
-// Sprite frame dimensions
+const TILE_NATIVE = 16
 const FRAME_WIDTH = 80
 const FRAME_HEIGHT = 64
-// Player asset height
 const FIGURE_NATIVE = 46
 
 const clamp = (val, min, max) => Math.min(Math.max(val, min), max)

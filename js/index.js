@@ -1,6 +1,16 @@
-// ctx is exposed globally by resizeCanvas.js
-const c = window.ctx
+const canvas = document.querySelector('canvas')
+const c = canvas.getContext('2d')
+c.imageSmoothingEnabled = false
+const dpr = window.devicePixelRatio || 1
 const winScreen = document.getElementById('win-screen')
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth * dpr
+  canvas.height = window.innerHeight * dpr
+}
+
+resizeCanvas()
+window.addEventListener('resize', resizeCanvas)
 
 const oceanLayerData = {
   l_New_Layer_1: l_New_Layer_1,
@@ -22,24 +32,24 @@ const layersData = {
 }
 
 const tilesets = {
-  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
-  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
-  l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
-  l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
-  l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
-  l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
-  l_Shrooms: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
-  l_Collisions: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
-  l_Grass: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
-  l_Trees: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
+  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Shrooms: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_Collisions: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Grass: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Trees: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
 }
 
 // Determine on-screen tile and figure sizes
-let tile_on_screen_px = TILESIZE_LOGIC
+let tile_on_screen_px = TILE_NATIVE
 const figure_on_screen_px = clamp(
-  Math.round((FIGURE_NATIVE / TILESIZE_SRC) * TILESIZE_LOGIC),
-  Math.round(((FIGURE_NATIVE - 1) * TILESIZE_LOGIC) / TILESIZE_SRC),
-  Math.round(((FIGURE_NATIVE + 1) * TILESIZE_LOGIC) / TILESIZE_SRC),
+  Math.round((FIGURE_NATIVE / TILE_NATIVE) * tile_on_screen_px),
+  Math.round((FIGURE_NATIVE - 1) * tile_on_screen_px / TILE_NATIVE),
+  Math.round((FIGURE_NATIVE + 1) * tile_on_screen_px / TILE_NATIVE),
 )
 const player_scale = figure_on_screen_px / FIGURE_NATIVE
 const LEVEL_EXTENSION_COLUMNS = 20
@@ -56,7 +66,6 @@ const illusions =
   typeof l_Illusions !== 'undefined' && l_Illusions.length
     ? l_Illusions
     : collisions.map((row) => row.map(() => 0))
-
 
 function extendLevelRight(layerArrays, extraColumns = LEVEL_EXTENSION_COLUMNS) {
   layerArrays.forEach((layer) => {
@@ -156,14 +165,6 @@ extendLevelRight([
   illusions,
 ])
 
-const floorGrid = collisions.map((row, y) =>
-  row.map((cell, x) => {
-    if (!cell) return 'air'
-    const north = y > 0 ? collisions[y - 1][x] : 0
-    return north ? 'solid_mass' : 'grass_top'
-  }),
-)
-
 collisions.forEach((row, y) => {
   row.forEach((symbol, x) => {
     l_Collisions[y][x] = symbol === 1 ? 1 : 0
@@ -176,7 +177,7 @@ collisions.forEach((row, y) => {
 
 const l_Filler = createFillerLayer(collisions)
 layersData.l_Filler = l_Filler
-tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILESIZE_SRC }
+tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILE_NATIVE }
 
 const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * tile_on_screen_px
 
@@ -307,11 +308,6 @@ const renderStaticLayers = async (layersData) => {
     }
   }
 
-  if (!FloorTiles.floorAtlas.complete) {
-    await new Promise((res) => (FloorTiles.floorAtlas.onload = res))
-  }
-  FloorTiles.drawAutoTiledGrid(offscreenContext, floorGrid)
-
   // Optionally draw collision blocks and platforms for debugging
   // collisionBlocks.forEach(block => block.draw(offscreenContext));
   // platforms.forEach((platform) => platform.draw(offscreenContext))
@@ -388,7 +384,10 @@ const keys = {
 }
 
 let lastTime = performance.now()
-let camera = cam
+let camera = {
+  x: 0,
+  y: 0,
+}
 
 let oceanBackgroundCanvas = null
 let brambleBackgroundCanvas = null
@@ -562,8 +561,10 @@ function init() {
     }),
   ]
 
-  camera.x = 0
-  camera.y = 0
+  camera = {
+    x: 0,
+    y: 0,
+  }
 }
 
 function animate(backgroundCanvas) {
@@ -752,14 +753,23 @@ function animate(backgroundCanvas) {
     }
   }
 
-  // Update and apply camera
-  updateCamera(player)
+  // Center camera on player
+  camera.x = Math.max(
+    0,
+    player.x - canvas.width / (2 * (dpr + 1))
+  )
+  camera.y = Math.max(
+    0,
+    player.y - canvas.height / (2 * (dpr + 1))
+  )
 
   // Render scene
   c.save()
   c.clearRect(0, 0, canvas.width, canvas.height)
-  applyCamera(c)
+  c.scale(dpr + 1, dpr + 1)
   const camX = Math.round(camera.x)
+  const camY = Math.round(camera.y)
+  c.translate(-camX, -camY)
   c.drawImage(oceanBackgroundCanvas, Math.round(camX * 0.32), 0)
   c.drawImage(brambleBackgroundCanvas, Math.round(camX * 0.16), 0)
   c.drawImage(backgroundCanvas, 0, 0)
@@ -785,10 +795,11 @@ function animate(backgroundCanvas) {
     gem.draw(c)
   }
 
-  restoreCamera(c)
+  c.restore()
 
-  // UI
+  // UI save and restore
   c.save()
+  c.scale(dpr + 1, dpr + 1)
   for (let i = hearts.length - 1; i >= 0; i--) {
     const heart = hearts[i]
     heart.draw(c)
