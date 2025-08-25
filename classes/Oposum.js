@@ -35,8 +35,8 @@ class Oposum {
     this.hitbox = {
       x: 0,
       y: 0,
-      width: 30,
-      height: 19,
+      width: width * (30 / 36),
+      height: height * (19 / 28),
     }
     this.distanceTraveled = 0
     this.turningDistance = turningDistance
@@ -95,7 +95,7 @@ class Oposum {
 
     // Update hitbox position
     this.hitbox.x = this.x
-    this.hitbox.y = this.y + 9
+    this.hitbox.y = this.y + this.height * (9 / 28)
 
     this.applyGravity(deltaTime)
 

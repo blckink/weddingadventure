@@ -1,7 +1,7 @@
 const canvas = document.getElementById('editor');
 const ctx = canvas.getContext('2d');
 
-const tileSize = 32;
+const tileSize = 64;
 let gridWidth;
 let gridHeight;
 let floors;

@@ -35,8 +35,8 @@ class Eagle {
     this.hitbox = {
       x: 0,
       y: 0,
-      width: 40,
-      height: 41,
+      width: width,
+      height: height,
     }
     this.distanceTraveled = 0
     this.turningDistance = turningDistance
@@ -95,7 +95,7 @@ class Eagle {
 
     // Update hitbox position
     this.hitbox.x = this.x
-    this.hitbox.y = this.y + 9
+    this.hitbox.y = this.y + this.height * (9 / 41)
 
     // this.applyGravity(deltaTime)
 
