@@ -68,6 +68,28 @@ const defaultState = JSON.parse(
 let floorImg;
 const enemyImgs = {};
 let gemImg;
+const FLOOR_TILE_SIZE = 32;
+
+function getFloorSrc(x, y) {
+  const hasLeft = x > 0 && floors[y][x - 1];
+  const hasRight = x < gridWidth - 1 && floors[y][x + 1];
+  const hasAbove = y > 0 && floors[y - 1][x];
+  const hasBelow = y < gridHeight - 1 && floors[y + 1][x];
+
+  if (!hasAbove) {
+    if (!hasLeft) return [0, 0];
+    if (!hasRight) return [FLOOR_TILE_SIZE * 2, 0];
+    return [FLOOR_TILE_SIZE, 0];
+  } else if (!hasBelow) {
+    if (!hasLeft) return [0, FLOOR_TILE_SIZE * 2];
+    if (!hasRight) return [FLOOR_TILE_SIZE * 2, FLOOR_TILE_SIZE * 2];
+    return [FLOOR_TILE_SIZE, FLOOR_TILE_SIZE * 2];
+  } else {
+    if (!hasLeft) return [0, FLOOR_TILE_SIZE];
+    if (!hasRight) return [FLOOR_TILE_SIZE * 2, FLOOR_TILE_SIZE];
+    return [FLOOR_TILE_SIZE, FLOOR_TILE_SIZE];
+  }
+}
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -79,7 +101,7 @@ function loadImage(src) {
 }
 
 Promise.all([
-  loadImage('./images/tileset.png'),
+  loadImage('./images/floor.png'),
   loadImage('./images/oposum.png'),
   loadImage('./images/eagle.png'),
   loadImage('./images/gem.png'),
@@ -112,12 +134,13 @@ function drawGrid() {
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
       if (floors[y][x]) {
+        const [sx, sy] = getFloorSrc(x, y);
         ctx.drawImage(
           floorImg,
-          0,
-          0,
-          16,
-          16,
+          sx,
+          sy,
+          FLOOR_TILE_SIZE,
+          FLOOR_TILE_SIZE,
           x * tileSize,
           y * tileSize,
           tileSize,

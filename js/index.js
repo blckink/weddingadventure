@@ -39,7 +39,7 @@ const tilesets = {
   l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
   l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
   l_Shrooms: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
-  l_Collisions: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Collisions: { imageUrl: './images/floor.png', tileSize: 32 },
   l_Grass: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
   l_Trees: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
 }
@@ -146,6 +146,28 @@ function createFillerLayer(collisions) {
   return filler
 }
 
+function getFloorTileIndex(grid, x, y) {
+  if (grid[y][x] !== 1) return 0
+  const hasLeft = x > 0 && grid[y][x - 1] === 1
+  const hasRight = x < grid[0].length - 1 && grid[y][x + 1] === 1
+  const hasAbove = y > 0 && grid[y - 1][x] === 1
+  const hasBelow = y < grid.length - 1 && grid[y + 1][x] === 1
+
+  if (!hasAbove) {
+    if (!hasLeft) return 1
+    if (!hasRight) return 3
+    return 2
+  } else if (!hasBelow) {
+    if (!hasLeft) return 7
+    if (!hasRight) return 9
+    return 8
+  } else {
+    if (!hasLeft) return 4
+    if (!hasRight) return 6
+    return 5
+  }
+}
+
 extendLevelRight([
   collisions,
   l_New_Layer_1,
@@ -167,7 +189,7 @@ extendLevelRight([
 
 collisions.forEach((row, y) => {
   row.forEach((symbol, x) => {
-    l_Collisions[y][x] = symbol === 1 ? 1 : 0
+    l_Collisions[y][x] = getFloorTileIndex(collisions, x, y)
     if (symbol === 0) {
       if (l_Back_Tiles[y]) l_Back_Tiles[y][x] = 0
       if (l_Front_Tiles[y]) l_Front_Tiles[y][x] = 0
