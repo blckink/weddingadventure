@@ -695,7 +695,13 @@ function animate(backgroundCanvas) {
   c.translate(-camX, -camY)
   parallaxBackgrounds.forEach((layer) => {
     if (layer.image) {
-      c.drawImage(layer.image, Math.round(camX * layer.factor), 0)
+      const imgWidth = layer.image.width
+      const canvasWidth = canvas.width / (dpr + 1)
+      let offset = Math.round((-camX * (1 - layer.factor)) % imgWidth)
+      if (offset > 0) offset -= imgWidth
+      for (let x = offset; x < canvasWidth; x += imgWidth) {
+        c.drawImage(layer.image, camX + x, 0)
+      }
     }
   })
   c.drawImage(backgroundCanvas, 0, 0)
