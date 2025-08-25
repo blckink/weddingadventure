@@ -208,24 +208,7 @@
     <script src="./data/l_Trees.js"></script>
     <script>
       const cb = Date.now();
-      document.write(
-        '<script src="./data/l_Blockers.js?cb=' + cb + '"></' + 'script>'
-      );
-      document.write(
-        '<script src="./data/l_Deaths.js?cb=' + cb + '"></' + 'script>'
-      );
-      document.write(
-        '<script src="./data/l_Illusions.js?cb=' + cb + '"></' + 'script>'
-      );
-      document.write(
-        '<script src="./data/l_Gems.js?cb=' + cb + '"></' + 'script>'
-      );
-      document.write(
-        '<script src="./data/l_Enemies.js?cb=' + cb + '"></' + 'script>'
-      );
-      document.write(
-        '<script src="./data/collisions.js?cb=' + cb + '"></' + 'script>'
-      );
+      document.write('<script src="level.php?cb=' + cb + '"></' + 'script>');
     </script>
     <script src="./js/utils.js"></script>
     <script src="./classes/CollisionBlock.js"></script>
