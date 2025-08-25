@@ -71,6 +71,7 @@ const illusions =
     ? l_Illusions
     : collisions.map((row) => row.map(() => 0))
 
+
 function extendLevelRight(layerArrays, extraColumns = LEVEL_EXTENSION_COLUMNS) {
   layerArrays.forEach((layer) => {
     layer.forEach((row) => {
@@ -168,6 +169,14 @@ extendLevelRight([
   deaths,
   illusions,
 ])
+
+const floorGrid = collisions.map((row, y) =>
+  row.map((cell, x) => {
+    if (!cell) return 'air'
+    const north = y > 0 ? collisions[y - 1][x] : 0
+    return north ? 'solid_mass' : 'grass_top'
+  }),
+)
 
 collisions.forEach((row, y) => {
   row.forEach((symbol, x) => {
@@ -311,6 +320,11 @@ const renderStaticLayers = async (layersData) => {
       }
     }
   }
+
+  if (!FloorTiles.floorAtlas.complete) {
+    await new Promise((res) => (FloorTiles.floorAtlas.onload = res))
+  }
+  FloorTiles.drawAutoTiledGrid(offscreenContext, floorGrid)
 
   // Optionally draw collision blocks and platforms for debugging
   // collisionBlocks.forEach(block => block.draw(offscreenContext));
