@@ -14,19 +14,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         isset($data['deaths']) &&
         isset($data['illusions'])
     ) {
-        $collisions = 'const collisions = ' . json_encode($data['collisions']) . ';';
-        $gems = 'const l_Gems = ' . json_encode($data['gems']) . ';';
-        $enemies = 'const l_Enemies = ' . json_encode($data['enemies']) . ';';
-        $blockers = 'const l_Blockers = ' . json_encode($data['blockers']) . ';';
-        $deaths = 'const l_Deaths = ' . json_encode($data['deaths']) . ';';
-        $illusions = 'const l_Illusions = ' . json_encode($data['illusions']) . ';';
-        file_put_contents(__DIR__ . '/data/collisions.js', $collisions);
-        file_put_contents(__DIR__ . '/data/l_Gems.js', $gems);
-        file_put_contents(__DIR__ . '/data/l_Enemies.js', $enemies);
-        file_put_contents(__DIR__ . '/data/l_Blockers.js', $blockers);
-        file_put_contents(__DIR__ . '/data/l_Deaths.js', $deaths);
-        file_put_contents(__DIR__ . '/data/l_Illusions.js', $illusions);
-        echo 'Saved';
+        $levelDir = __DIR__ . '/../level';
+        if (!is_dir($levelDir)) {
+            mkdir($levelDir, 0755, true);
+        }
+        $saved = file_put_contents(
+            $levelDir . '/level.json',
+            json_encode($data)
+        );
+        if ($saved === false) {
+            http_response_code(500);
+            echo 'Save failed';
+        } else {
+            echo 'Saved';
+        }
     } else {
         http_response_code(400);
         echo 'Invalid data';
