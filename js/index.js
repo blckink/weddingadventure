@@ -1,5 +1,6 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
+c.imageSmoothingEnabled = false
 const dpr = window.devicePixelRatio || 1
 const winScreen = document.getElementById('win-screen')
 
@@ -31,19 +32,26 @@ const layersData = {
 }
 
 const tilesets = {
-  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: 16 },
-  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: 16 },
-  l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: 16 },
-  l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: 16 },
-  l_Decorations: { imageUrl: './images/decorations.png', tileSize: 16 },
-  l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: 16 },
-  l_Shrooms: { imageUrl: './images/decorations.png', tileSize: 16 },
-  l_Collisions: { imageUrl: './images/tileset.png', tileSize: 16 },
-  l_Grass: { imageUrl: './images/tileset.png', tileSize: 16 },
-  l_Trees: { imageUrl: './images/decorations.png', tileSize: 16 },
+  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Shrooms: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_Collisions: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Grass: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
+  l_Trees: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
 }
 
-const TILE_SIZE = 64
+// Determine on-screen tile and figure sizes
+let tile_on_screen_px = TILE_NATIVE
+const figure_on_screen_px = clamp(
+  Math.round((FIGURE_NATIVE / TILE_NATIVE) * tile_on_screen_px),
+  Math.round((FIGURE_NATIVE - 1) * tile_on_screen_px / TILE_NATIVE),
+  Math.round((FIGURE_NATIVE + 1) * tile_on_screen_px / TILE_NATIVE),
+)
+const player_scale = figure_on_screen_px / FIGURE_NATIVE
 const LEVEL_EXTENSION_COLUMNS = 20
 
 const blockers =
@@ -169,16 +177,16 @@ collisions.forEach((row, y) => {
 
 const l_Filler = createFillerLayer(collisions)
 layersData.l_Filler = l_Filler
-tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILE_SIZE }
+tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILE_NATIVE }
 
-const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * TILE_SIZE
+const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * tile_on_screen_px
 
 // Tile setup
 const collisionBlocks = []
 const platforms = []
 const deathBlocks = []
 const illusionBlocks = []
-const blockSize = TILE_SIZE // Assuming each tile is 16x16 pixels
+const blockSize = tile_on_screen_px // Assuming each tile is 16x16 pixels
 
 const illusionPositions = new Set()
 illusions.forEach((row, y) => {
@@ -211,8 +219,8 @@ collisions.forEach((row, y) => {
         new Platform({
           x: x * blockSize,
           y: y * blockSize + blockSize,
-          width: TILE_SIZE,
-          height: TILE_SIZE / 4,
+          width: tile_on_screen_px,
+          height: tile_on_screen_px / 4,
         }),
       )
     }
@@ -261,10 +269,10 @@ const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
           srcY, // source x, y
           tileSize,
           tileSize, // source width, height
-          x * TILE_SIZE,
-          y * TILE_SIZE, // destination x, y
-          TILE_SIZE,
-          TILE_SIZE, // destination width, height
+          x * tile_on_screen_px,
+          y * tile_on_screen_px, // destination x, y
+          tile_on_screen_px,
+          tile_on_screen_px, // destination width, height
         )
       }
     })
@@ -272,7 +280,7 @@ const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
 }
 
 const renderStaticLayers = async (layersData) => {
-  const tileSize = TILE_SIZE
+  const tileSize = tile_on_screen_px
   const layerArrays = Object.values(layersData)
   const maxWidth = Math.max(...layerArrays.map((layer) => layer[0].length))
   const maxHeight = Math.max(...layerArrays.map((layer) => layer.length))
@@ -281,6 +289,7 @@ const renderStaticLayers = async (layersData) => {
   offscreenCanvas.width = maxWidth * tileSize
   offscreenCanvas.height = maxHeight * tileSize
   const offscreenContext = offscreenCanvas.getContext('2d')
+  offscreenContext.imageSmoothingEnabled = false
 
   for (const [layerName, tilesData] of Object.entries(layersData)) {
     const tilesetInfo = tilesets[layerName]
@@ -311,8 +320,8 @@ const renderStaticLayers = async (layersData) => {
 let player = new Player({
   x: 100,
   y: 100,
-  width: TILE_SIZE * 2,
-  height: TILE_SIZE * 2,
+  scale: player_scale,
+  tileSize: tile_on_screen_px,
   velocity: { x: 0, y: 0 },
 })
 player.snapToGround(collisionBlocks)
@@ -422,8 +431,8 @@ function init() {
       if (symbol === 18) {
         gems.push(
           new Sprite({
-            x: x * TILE_SIZE,
-            y: y * TILE_SIZE,
+            x: x * tile_on_screen_px,
+            y: y * tile_on_screen_px,
             width: 40,
             height: 32,
             imageSrc: './images/gem.png',
@@ -435,8 +444,8 @@ function init() {
               frames: 5,
             },
             hitbox: {
-              x: x * TILE_SIZE,
-              y: y * TILE_SIZE,
+              x: x * tile_on_screen_px,
+              y: y * tile_on_screen_px,
               width: 40,
               height: 32,
             },
@@ -449,8 +458,8 @@ function init() {
   player = new Player({
     x: 100,
     y: 100,
-    width: TILE_SIZE * 2,
-    height: TILE_SIZE * 2,
+    scale: player_scale,
+    tileSize: tile_on_screen_px,
     velocity: { x: 0, y: 0 },
   })
   eagles = []
@@ -461,8 +470,8 @@ function init() {
         if (symbol === 1) {
           oposums.push(
             new Oposum({
-              x: x * TILE_SIZE,
-              y: y * TILE_SIZE,
+              x: x * tile_on_screen_px,
+              y: y * tile_on_screen_px,
               width: 80,
               height: 64,
             }),
@@ -470,8 +479,8 @@ function init() {
         } else if (symbol === 2) {
           eagles.push(
             new Eagle({
-              x: x * TILE_SIZE,
-              y: y * TILE_SIZE,
+              x: x * tile_on_screen_px,
+              y: y * tile_on_screen_px,
               width: 80,
               height: 64,
             }),
@@ -704,7 +713,7 @@ function animate(backgroundCanvas) {
       sprites.push(
         new Sprite({
           x: gem.x - 20,
-          y: gem.y - 16,
+          y: gem.y - tile_on_screen_px,
           width: 80,
           height: 64,
           imageSrc: './images/item-feedback.png',
@@ -756,9 +765,11 @@ function animate(backgroundCanvas) {
   c.save()
   c.clearRect(0, 0, canvas.width, canvas.height)
   c.scale(dpr + 1, dpr + 1)
-  c.translate(-camera.x, -camera.y)
-  c.drawImage(oceanBackgroundCanvas, camera.x * 0.32, 0)
-  c.drawImage(brambleBackgroundCanvas, camera.x * 0.16, 0)
+  const camX = Math.round(camera.x)
+  const camY = Math.round(camera.y)
+  c.translate(-camX, -camY)
+  c.drawImage(oceanBackgroundCanvas, Math.round(camX * 0.32), 0)
+  c.drawImage(brambleBackgroundCanvas, Math.round(camX * 0.16), 0)
   c.drawImage(backgroundCanvas, 0, 0)
   player.draw(c)
 

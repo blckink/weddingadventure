@@ -1,5 +1,5 @@
 class Platform {
-  constructor({ x, y, width = 16, height = 4 }) {
+  constructor({ x, y, width = TILE_NATIVE, height = TILE_NATIVE / 4 }) {
     this.x = x
     this.y = y
     this.width = width

@@ -3,11 +3,13 @@ const JUMP_POWER = 288.75
 const GRAVITY = 580
 
 class Player {
-  constructor({ x, y, width = 32, height = 32, velocity = { x: 0, y: 0 } }) {
+  constructor({ x, y, scale = 1, tileSize = TILE_NATIVE, velocity = { x: 0, y: 0 } }) {
+    this.scale = scale
+    this.tileSize = tileSize
     this.x = x
     this.y = y
-    this.width = width
-    this.height = height
+    this.width = Math.round(FRAME_WIDTH * scale)
+    this.height = Math.round(FRAME_HEIGHT * scale)
     this.velocity = velocity
     this.isOnGround = false
     this.isImageLoaded = false
@@ -22,47 +24,56 @@ class Player {
       idle: {
         x: 0,
         y: 0,
-        width: 80,
-        height: 64,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 5,
       },
       run: {
         x: 0,
-        y: 64 * 2,
-        width: 80,
-        height: 64,
+        y: FRAME_HEIGHT * 2,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 8,
       },
       jump: {
         x: 0,
-        y: 64 * 3,
-        width: 80,
-        height: 64,
+        y: FRAME_HEIGHT * 3,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 4,
       },
       land: {
         x: 0,
-        y: 64 * 4,
-        width: 80,
-        height: 64,
+        y: FRAME_HEIGHT * 4,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 4,
       },
       attack: {
         x: 0,
-        y: 64 * 5,
-        width: 80,
-        height: 64,
+        y: FRAME_HEIGHT * 5,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 6,
       },
     }
     this.currentSprite = this.sprites.idle
     this.facing = 'right'
+
+    const figurePx = FIGURE_NATIVE * scale
     this.hitbox = {
       x: 0,
       y: 0,
-      width: 20,
-      height: 23,
+      width: Math.round(0.522 * figurePx),
+      height: Math.round(0.957 * figurePx),
     }
+    this.hitboxOffset = {
+      x: Math.round((this.width - this.hitbox.width) / 2),
+      y: Math.round(this.height - this.hitbox.height),
+    }
+    this.hitbox.x = this.x + this.hitboxOffset.x
+    this.hitbox.y = this.y + this.hitboxOffset.y
+
     this.isInvincible = false
     this.isAttacking = false
   }
@@ -90,13 +101,12 @@ class Player {
 
     if (this.isImageLoaded === true) {
       let xScale = 1
-      let x = this.x
-
+      let drawX = Math.round(this.x)
       if (this.facing === 'right') {
         xScale = -1
-        x = -this.x - this.width
+        drawX = -Math.round(this.x + this.width)
       }
-
+      const drawY = Math.round(this.y)
       c.save()
       if (this.isInvincible) {
         c.globalAlpha = 0.5
@@ -110,10 +120,10 @@ class Player {
         this.currentSprite.y,
         this.currentSprite.width,
         this.currentSprite.height,
-        x,
-        this.y,
-        this.width,
-        this.height
+        drawX,
+        drawY,
+        Math.round(this.width),
+        Math.round(this.height)
       )
       c.restore()
     }
@@ -137,8 +147,8 @@ class Player {
     }
 
     // Update hitbox position
-    this.hitbox.x = this.x + 4
-    this.hitbox.y = this.y + 9
+    this.hitbox.x = this.x + this.hitboxOffset.x
+    this.hitbox.y = this.y + this.hitboxOffset.y
 
     this.applyGravity(deltaTime)
 
@@ -219,12 +229,12 @@ class Player {
 
   updateHorizontalPosition(deltaTime) {
     this.x += this.velocity.x * deltaTime
-    this.hitbox.x += this.velocity.x * deltaTime
+    this.hitbox.x = this.x + this.hitboxOffset.x
   }
 
   updateVerticalPosition(deltaTime) {
     this.y += this.velocity.y * deltaTime
-    this.hitbox.y += this.velocity.y * deltaTime
+    this.hitbox.y = this.y + this.hitboxOffset.y
   }
 
   applyGravity(deltaTime) {
@@ -258,14 +268,14 @@ class Player {
         // Check collision while player is going left
         if (this.velocity.x < -0) {
           this.hitbox.x = collisionBlock.x + collisionBlock.width + buffer
-          this.x = this.hitbox.x - 4
+          this.x = this.hitbox.x - this.hitboxOffset.x
           break
         }
 
         // Check collision while player is going right
         if (this.velocity.x > 0) {
           this.hitbox.x = collisionBlock.x - this.hitbox.width - buffer
-          this.x = this.hitbox.x - 4
+          this.x = this.hitbox.x - this.hitboxOffset.x
           break
         }
       }
@@ -288,15 +298,15 @@ class Player {
         if (this.velocity.y < 0) {
           this.velocity.y = 0
           this.hitbox.y = collisionBlock.y + collisionBlock.height + buffer
-          this.y = this.hitbox.y - 9
+          this.y = this.hitbox.y - this.hitboxOffset.y
           break
         }
 
         // Check collision while player is going down
         if (this.velocity.y > 0) {
           this.velocity.y = 0
-          this.y = collisionBlock.y - this.height - buffer
           this.hitbox.y = collisionBlock.y - this.hitbox.height - buffer
+          this.y = this.hitbox.y - this.hitboxOffset.y
           this.isOnGround = true
           break
         }
@@ -318,7 +328,7 @@ class Player {
   }
 
   snapToGround(collisionBlocks) {
-    const tileSize = 16
+    const tileSize = this.tileSize
     const groundTileY = Math.floor((this.y + this.height) / tileSize)
     const groundTileX = Math.floor((this.x + this.width / 2) / tileSize)
     const block = collisionBlocks.find(
@@ -326,7 +336,8 @@ class Player {
     )
     if (block) {
       this.y = block.y - this.height
-      this.hitbox.y = this.y + 9
+      this.hitbox.x = this.x + this.hitboxOffset.x
+      this.hitbox.y = this.y + this.hitboxOffset.y
       this.velocity.y = 0
       this.isOnGround = true
     }
