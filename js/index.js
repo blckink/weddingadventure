@@ -426,6 +426,8 @@ function init() {
     },
   })
 
+  const gemWidth = tile_on_screen_px
+  const gemHeight = tile_on_screen_px * (13 / 15)
   l_Gems.forEach((row, y) => {
     row.forEach((symbol, x) => {
       if (symbol === 18) {
@@ -433,8 +435,8 @@ function init() {
           new Sprite({
             x: x * tile_on_screen_px,
             y: y * tile_on_screen_px,
-            width: 40,
-            height: 32,
+            width: gemWidth,
+            height: gemHeight,
             imageSrc: './images/gem.png',
             spriteCropbox: {
               x: 0,
@@ -446,8 +448,8 @@ function init() {
             hitbox: {
               x: x * tile_on_screen_px,
               y: y * tile_on_screen_px,
-              width: 40,
-              height: 32,
+              width: gemWidth,
+              height: gemHeight,
             },
           }),
         )
@@ -472,8 +474,8 @@ function init() {
             new Oposum({
               x: x * tile_on_screen_px,
               y: y * tile_on_screen_px,
-              width: 80,
-              height: 64,
+              width: tile_on_screen_px,
+              height: tile_on_screen_px * (28 / 36),
             }),
           )
         } else if (symbol === 2) {
@@ -481,8 +483,8 @@ function init() {
             new Eagle({
               x: x * tile_on_screen_px,
               y: y * tile_on_screen_px,
-              width: 80,
-              height: 64,
+              width: tile_on_screen_px,
+              height: tile_on_screen_px * (41 / 40),
             }),
           )
         }
@@ -494,8 +496,8 @@ function init() {
     new Sprite({
       x: 1800 + LEVEL_EXTENSION_OFFSET,
       y: 100,
-      width: 40,
-      height: 32,
+      width: gemWidth,
+      height: gemHeight,
       imageSrc: './images/gem.png',
       spriteCropbox: {
         x: 0,
@@ -507,8 +509,8 @@ function init() {
       hitbox: {
         x: 1800 + LEVEL_EXTENSION_OFFSET,
         y: 100,
-        width: 40,
-        height: 32,
+        width: gemWidth,
+        height: gemHeight,
       },
     }),
   )
