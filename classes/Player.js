@@ -3,7 +3,7 @@ const JUMP_POWER = 288.75
 const GRAVITY = 580
 
 class Player {
-  constructor({ x, y, width = 80, height = 64, velocity = { x: 0, y: 0 } }) {
+  constructor({ x, y, width = 32, height = 32, velocity = { x: 0, y: 0 } }) {
     this.x = x
     this.y = y
     this.width = width
@@ -60,8 +60,8 @@ class Player {
     this.hitbox = {
       x: 0,
       y: 0,
-      width: 50,
-      height: 46,
+      width: 20,
+      height: 23,
     }
     this.isInvincible = false
     this.isAttacking = false
@@ -137,8 +137,8 @@ class Player {
     }
 
     // Update hitbox position
-    this.hitbox.x = this.x + 10
-    this.hitbox.y = this.y + 18
+    this.hitbox.x = this.x + 4
+    this.hitbox.y = this.y + 9
 
     this.applyGravity(deltaTime)
 
@@ -258,14 +258,14 @@ class Player {
         // Check collision while player is going left
         if (this.velocity.x < -0) {
           this.hitbox.x = collisionBlock.x + collisionBlock.width + buffer
-          this.x = this.hitbox.x - 10
+          this.x = this.hitbox.x - 4
           break
         }
 
         // Check collision while player is going right
         if (this.velocity.x > 0) {
           this.hitbox.x = collisionBlock.x - this.hitbox.width - buffer
-          this.x = this.hitbox.x - 10
+          this.x = this.hitbox.x - 4
           break
         }
       }
@@ -288,7 +288,7 @@ class Player {
         if (this.velocity.y < 0) {
           this.velocity.y = 0
           this.hitbox.y = collisionBlock.y + collisionBlock.height + buffer
-          this.y = this.hitbox.y - 18
+          this.y = this.hitbox.y - 9
           break
         }
 
@@ -326,7 +326,7 @@ class Player {
     )
     if (block) {
       this.y = block.y - this.height
-      this.hitbox.y = this.y + 18
+      this.hitbox.y = this.y + 9
       this.velocity.y = 0
       this.isOnGround = true
     }
