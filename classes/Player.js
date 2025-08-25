@@ -15,47 +15,47 @@ class Player {
     this.image.onload = () => {
       this.isImageLoaded = true
     }
-    this.image.src = './images/player.png'
+    this.image.src = './images/character.png'
     this.elapsedTime = 0
     this.currentFrame = 0
     this.sprites = {
       idle: {
         x: 0,
         y: 0,
-        width: 33,
-        height: 32,
-        frames: 4,
+        width: 80,
+        height: 64,
+        frames: 5,
       },
       run: {
         x: 0,
-        y: 32,
-        width: 33,
-        height: 32,
-        frames: 6,
+        y: 64 * 2,
+        width: 80,
+        height: 64,
+        frames: 8,
       },
       jump: {
         x: 0,
-        y: 32 * 5,
-        width: 33,
-        height: 32,
-        frames: 1,
+        y: 64 * 3,
+        width: 80,
+        height: 64,
+        frames: 4,
       },
       fall: {
-        x: 33,
-        y: 32 * 5,
-        width: 33,
-        height: 32,
-        frames: 1,
+        x: 0,
+        y: 64 * 4,
+        width: 80,
+        height: 64,
+        frames: 4,
       },
       roll: {
         x: 0,
-        y: 32 * 9,
-        width: 33,
-        height: 32,
-        frames: 4,
+        y: 64 * 5,
+        width: 80,
+        height: 64,
+        frames: 6,
       },
     }
-    this.currentSprite = this.sprites.roll
+    this.currentSprite = this.sprites.idle
     this.facing = 'right'
     this.hitbox = {
       x: 0,
@@ -93,7 +93,7 @@ class Player {
       let xScale = 1
       let x = this.x
 
-      if (this.facing === 'left') {
+      if (this.facing === 'right') {
         xScale = -1
         x = -this.x - this.width
       }
