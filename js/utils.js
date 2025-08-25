@@ -1,3 +1,10 @@
+// Global sizing constants
+const TILE_NATIVE = 16
+const FRAME_SIZE = 64
+const FIGURE_NATIVE = 46
+
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
+
 const loadImage = (src) => {
   return new Promise((resolve, reject) => {
     const img = new Image()
