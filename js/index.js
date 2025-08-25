@@ -10,7 +10,9 @@ function resizeCanvas() {
   canvas.height = innerHeight * dpr
   canvas.style.width = `${innerWidth}px`
   canvas.style.height = `${innerHeight}px`
-  c.setTransform(dpr, 0, 0, dpr, 0, 0)
+  // Reset any existing transforms; scaling for high-DPI displays is handled
+  // within the render loop to avoid applying the device pixel ratio twice.
+  c.setTransform(1, 0, 0, 1, 0, 0)
 }
 
 resizeCanvas()
