@@ -10,7 +10,7 @@ window.addEventListener('keydown', (event) => {
       keys.d.pressed = true
       break
     case ' ':
-      player.roll()
+      player.attack()
       break
   }
 })
@@ -41,7 +41,7 @@ window.addEventListener('focus', () => {
 // Touch controls
 const joystickBase = document.getElementById('joystick-base')
 const joystickKnob = document.getElementById('joystick-knob')
-const rollButton = document.getElementById('roll-button')
+const attackButton = document.getElementById('attack-button')
 const jumpButton = document.getElementById('jump-button')
 
 let joystickPointerId = null
@@ -89,9 +89,9 @@ if (joystickBase && joystickKnob) {
   })
 }
 
-if (rollButton) {
-  rollButton.addEventListener('pointerdown', () => {
-    player.roll()
+if (attackButton) {
+  attackButton.addEventListener('pointerdown', () => {
+    player.attack()
   })
 }
 

@@ -3,11 +3,11 @@ const JUMP_POWER = 288.75
 const GRAVITY = 580
 
 class Player {
-  constructor({ x, y, size, velocity = { x: 0, y: 0 } }) {
+  constructor({ x, y, width = 80, height = 64, velocity = { x: 0, y: 0 } }) {
     this.x = x
     this.y = y
-    this.width = size
-    this.height = size
+    this.width = width
+    this.height = height
     this.velocity = velocity
     this.isOnGround = false
     this.isImageLoaded = false
@@ -15,57 +15,56 @@ class Player {
     this.image.onload = () => {
       this.isImageLoaded = true
     }
-    this.image.src = './images/player.png'
+    this.image.src = './images/character.png'
     this.elapsedTime = 0
     this.currentFrame = 0
     this.sprites = {
       idle: {
         x: 0,
         y: 0,
-        width: 33,
-        height: 32,
-        frames: 4,
+        width: 80,
+        height: 64,
+        frames: 5,
       },
       run: {
         x: 0,
-        y: 32,
-        width: 33,
-        height: 32,
-        frames: 6,
+        y: 64 * 2,
+        width: 80,
+        height: 64,
+        frames: 8,
       },
       jump: {
         x: 0,
-        y: 32 * 5,
-        width: 33,
-        height: 32,
-        frames: 1,
-      },
-      fall: {
-        x: 33,
-        y: 32 * 5,
-        width: 33,
-        height: 32,
-        frames: 1,
-      },
-      roll: {
-        x: 0,
-        y: 32 * 9,
-        width: 33,
-        height: 32,
+        y: 64 * 3,
+        width: 80,
+        height: 64,
         frames: 4,
       },
+      land: {
+        x: 0,
+        y: 64 * 4,
+        width: 80,
+        height: 64,
+        frames: 4,
+      },
+      attack: {
+        x: 0,
+        y: 64 * 5,
+        width: 80,
+        height: 64,
+        frames: 6,
+      },
     }
-    this.currentSprite = this.sprites.roll
+    this.currentSprite = this.sprites.idle
     this.facing = 'right'
     this.hitbox = {
       x: 0,
       y: 0,
-      width: 20,
-      height: 23,
+      width: 50,
+      height: 46,
     }
     this.isInvincible = false
-    this.isRolling = false
-    this.isInAirAfterRolling = false
+    this.isAttacking = false
   }
 
   setIsInvincible() {
@@ -93,7 +92,7 @@ class Player {
       let xScale = 1
       let x = this.x
 
-      if (this.facing === 'left') {
+      if (this.facing === 'right') {
         xScale = -1
         x = -this.x - this.width
       }
@@ -129,15 +128,17 @@ class Player {
     if (this.elapsedTime > secondsInterval) {
       this.currentFrame = (this.currentFrame + 1) % this.currentSprite.frames
       this.elapsedTime -= secondsInterval
-    }
-
-    if (this.isRolling && this.currentFrame === 3) {
-      this.isRolling = false
+      if (
+        this.isAttacking &&
+        this.currentFrame === this.currentSprite.frames - 1
+      ) {
+        this.isAttacking = false
+      }
     }
 
     // Update hitbox position
-    this.hitbox.x = this.x + 4
-    this.hitbox.y = this.y + 9
+    this.hitbox.x = this.x + 10
+    this.hitbox.y = this.y + 18
 
     this.applyGravity(deltaTime)
 
@@ -156,14 +157,12 @@ class Player {
     this.switchSprites()
   }
 
-  roll() {
-    if (this.isOnGround) {
-      this.currentSprite = this.sprites.roll
-      this.currentFrame = 0
-      this.isRolling = true
-      this.isInAirAfterRolling = true
-      this.velocity.x = this.facing === 'right' ? 300 : -300
-    }
+  attack() {
+    if (this.isAttacking) return
+    this.currentSprite = this.sprites.attack
+    this.currentFrame = 0
+    this.isAttacking = true
+    this.velocity.x = 0
   }
 
   determineDirection() {
@@ -175,7 +174,7 @@ class Player {
   }
 
   switchSprites() {
-    if (this.isRolling) return
+    if (this.isAttacking) return
 
     if (
       this.isOnGround &&
@@ -204,11 +203,11 @@ class Player {
     } else if (
       !this.isOnGround &&
       this.velocity.y > 0 &&
-      this.currentSprite !== this.sprites.fall
+      this.currentSprite !== this.sprites.land
     ) {
-      // Fall
+      // Land
       this.currentFrame = 0
-      this.currentSprite = this.sprites.fall
+      this.currentSprite = this.sprites.land
     }
   }
 
@@ -233,7 +232,7 @@ class Player {
   }
 
   handleInput(keys) {
-    if (this.isRolling || this.isInAirAfterRolling) return
+    if (this.isAttacking) return
 
     this.velocity.x = 0
 
@@ -242,12 +241,6 @@ class Player {
     } else if (keys.a.pressed) {
       this.velocity.x = -X_VELOCITY
     }
-  }
-
-  stopRoll() {
-    this.velocity.x = 0
-    this.isRolling = false
-    this.isInAirAfterRolling = false
   }
 
   checkForHorizontalCollisions(collisionBlocks) {
@@ -265,16 +258,14 @@ class Player {
         // Check collision while player is going left
         if (this.velocity.x < -0) {
           this.hitbox.x = collisionBlock.x + collisionBlock.width + buffer
-          this.x = this.hitbox.x - 4
-          this.stopRoll()
+          this.x = this.hitbox.x - 10
           break
         }
 
         // Check collision while player is going right
         if (this.velocity.x > 0) {
           this.hitbox.x = collisionBlock.x - this.hitbox.width - buffer
-          this.x = this.hitbox.x - 4
-          this.stopRoll()
+          this.x = this.hitbox.x - 10
           break
         }
       }
@@ -297,7 +288,7 @@ class Player {
         if (this.velocity.y < 0) {
           this.velocity.y = 0
           this.hitbox.y = collisionBlock.y + collisionBlock.height + buffer
-          this.y = this.hitbox.y - 9
+          this.y = this.hitbox.y - 18
           break
         }
 
@@ -307,8 +298,6 @@ class Player {
           this.y = collisionBlock.y - this.height - buffer
           this.hitbox.y = collisionBlock.y - this.hitbox.height - buffer
           this.isOnGround = true
-
-          if (!this.isRolling) this.isInAirAfterRolling = false
           break
         }
       }
@@ -337,7 +326,7 @@ class Player {
     )
     if (block) {
       this.y = block.y - this.height
-      this.hitbox.y = this.y + 9
+      this.hitbox.y = this.y + 18
       this.velocity.y = 0
       this.isOnGround = true
     }

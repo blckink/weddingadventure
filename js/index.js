@@ -311,7 +311,8 @@ const renderStaticLayers = async (layersData) => {
 let player = new Player({
   x: 100,
   y: 100,
-  size: 32,
+  width: 80,
+  height: 64,
   velocity: { x: 0, y: 0 },
 })
 player.snapToGround(collisionBlocks)
@@ -448,7 +449,8 @@ function init() {
   player = new Player({
     x: 100,
     y: 100,
-    size: 32,
+    width: 80,
+    height: 64,
     velocity: { x: 0, y: 0 },
   })
   eagles = []
