@@ -1,4 +1,4 @@
-const canvas = window.canvas
+// ctx is exposed globally by resizeCanvas.js
 const c = window.ctx
 const winScreen = document.getElementById('win-screen')
 
