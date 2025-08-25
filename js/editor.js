@@ -202,10 +202,12 @@ function drawGrid() {
 
 function getPos(evt) {
   const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
   const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
   const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
-  const x = Math.floor((clientX - rect.left) / tileSize);
-  const y = Math.floor((clientY - rect.top) / tileSize);
+  const x = Math.floor(((clientX - rect.left) * scaleX) / tileSize);
+  const y = Math.floor(((clientY - rect.top) * scaleY) / tileSize);
   return { x, y };
 }
 
