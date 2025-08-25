@@ -79,15 +79,6 @@ const defaultState = JSON.parse(
 const enemyImgs = {};
 let gemImg;
 
-function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
 Promise.all([
   loadImage('./images/floor.png'),
   loadImage('./images/oposum.png'),
