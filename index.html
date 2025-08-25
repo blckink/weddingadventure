@@ -7,95 +7,83 @@
     <meta http-equiv="Expires" content="0" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
     <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        font: inherit;
-        vertical-align: baseline;
-      }
-
       html,
       body {
-        height: 100%;
-        background: black;
-        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background: #000;
+        overscroll-behavior: none;
         touch-action: none;
+      }
+
+      #game-root {
+        width: 100vw;
+        height: 100svh;
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: #000;
       }
 
       canvas {
         display: block;
-        width: 100vw;
-        height: 100vh;
+        image-rendering: pixelated;
       }
 
-      /* Touch controls */
-      #joystick-base {
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        touch-action: none;
+      #fs-btn {
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        border: none;
+        font-size: 24px;
+        pointer-events: auto;
       }
 
-      #joystick-knob {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 40px;
-        height: 40px;
-        margin-left: -20px;
-        margin-top: -20px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
+      #touch-ui {
+        position: fixed;
+        inset: 0;
         pointer-events: none;
-        transition: transform 0.2s ease;
       }
 
-      #attack-button {
+      #dpad {
+        position: absolute;
+        left: 20px;
+        bottom: 20px;
+        width: 96px;
+        height: 96px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        pointer-events: auto;
+      }
+
+      #btn-a,
+      #btn-b {
         position: absolute;
         bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
+        width: 72px;
+        height: 72px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.3);
-        touch-action: none;
+        pointer-events: auto;
       }
 
-      #jump-button {
-        position: absolute;
-        bottom: 100px;
+      #btn-a {
         right: 20px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        touch-action: none;
       }
 
-      #fullscreen-button {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        width: 40px;
-        height: 40px;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.3);
-        color: white;
-        font-family: sans-serif;
-        touch-action: none;
+      #btn-b {
+        right: 112px;
       }
 
       #start-screen {
@@ -173,6 +161,12 @@
       #win-screen.hidden {
         display: none;
       }
+
+      @media (pointer: fine) {
+        #touch-ui {
+          display: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -187,17 +181,15 @@
       </div>
     </div>
     <div id="win-screen" class="hidden">YOU WIN!</div>
-    <canvas style="image-rendering: pixelated"></canvas>
-    <p style="color: white; font-family: sans-serif; margin: 8px">
-      WASD to move, Spacebar to attack. Drag left circle to move and use
-      right buttons on touch devices.
-    </p>
-    <div id="joystick-base">
-      <div id="joystick-knob"></div>
+    <div id="game-root">
+      <canvas id="game"></canvas>
     </div>
-    <div id="attack-button"></div>
-    <div id="jump-button"></div>
-    <button id="fullscreen-button">⛶</button>
+    <button id="fs-btn">⛶</button>
+    <div id="touch-ui">
+      <div id="dpad"></div>
+      <div id="btn-a"></div>
+      <div id="btn-b"></div>
+    </div>
     <script src="./data/l_New_Layer_1.js"></script>
     <script src="./data/l_New_Layer_2.js"></script>
     <script src="./data/l_New_Layer_8.js"></script>
@@ -241,6 +233,8 @@
     <script src="./classes/Sprite.js"></script>
     <script src="./classes/Heart.js"></script>
 
+    <script src="./js/resizeCanvas.js"></script>
+    <script src="./js/camera.js"></script>
     <script src="./js/floorTiles.js"></script>
     <script src="./js/index.js"></script>
     <script src="./js/eventListeners.js"></script>
