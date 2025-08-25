@@ -1,6 +1,7 @@
 // Global sizing constants
 const TILE_NATIVE = 16
-const FRAME_SIZE = 64
+const FRAME_WIDTH = 80
+const FRAME_HEIGHT = 64
 const FIGURE_NATIVE = 46
 
 const clamp = (val, min, max) => Math.min(Math.max(val, min), max)

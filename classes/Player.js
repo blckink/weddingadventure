@@ -8,8 +8,8 @@ class Player {
     this.tileSize = tileSize
     this.x = x
     this.y = y
-    this.width = Math.round(FRAME_SIZE * scale)
-    this.height = Math.round(FRAME_SIZE * scale)
+    this.width = Math.round(FRAME_WIDTH * scale)
+    this.height = Math.round(FRAME_HEIGHT * scale)
     this.velocity = velocity
     this.isOnGround = false
     this.isImageLoaded = false
@@ -24,36 +24,36 @@ class Player {
       idle: {
         x: 0,
         y: 0,
-        width: FRAME_SIZE,
-        height: FRAME_SIZE,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 5,
       },
       run: {
         x: 0,
-        y: FRAME_SIZE * 2,
-        width: FRAME_SIZE,
-        height: FRAME_SIZE,
+        y: FRAME_HEIGHT * 2,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 8,
       },
       jump: {
         x: 0,
-        y: FRAME_SIZE * 3,
-        width: FRAME_SIZE,
-        height: FRAME_SIZE,
+        y: FRAME_HEIGHT * 3,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 4,
       },
       land: {
         x: 0,
-        y: FRAME_SIZE * 4,
-        width: FRAME_SIZE,
-        height: FRAME_SIZE,
+        y: FRAME_HEIGHT * 4,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 4,
       },
       attack: {
         x: 0,
-        y: FRAME_SIZE * 5,
-        width: FRAME_SIZE,
-        height: FRAME_SIZE,
+        y: FRAME_HEIGHT * 5,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT,
         frames: 6,
       },
     }
