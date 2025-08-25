@@ -5,8 +5,12 @@ const dpr = window.devicePixelRatio || 1
 const winScreen = document.getElementById('win-screen')
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth * dpr
-  canvas.height = window.innerHeight * dpr
+  const { innerWidth, innerHeight } = window
+  canvas.width = innerWidth * dpr
+  canvas.height = innerHeight * dpr
+  canvas.style.width = `${innerWidth}px`
+  canvas.style.height = `${innerHeight}px`
+  c.setTransform(dpr, 0, 0, dpr, 0, 0)
 }
 
 resizeCanvas()
