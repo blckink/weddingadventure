@@ -43,7 +43,7 @@ const tilesets = {
   l_Trees: { imageUrl: './images/decorations.png', tileSize: 16 },
 }
 
-const TILE_SIZE = 16
+const TILE_SIZE = 64
 const LEVEL_EXTENSION_COLUMNS = 20
 
 const blockers =
@@ -211,8 +211,8 @@ collisions.forEach((row, y) => {
         new Platform({
           x: x * blockSize,
           y: y * blockSize + blockSize,
-          width: 16,
-          height: 4,
+          width: TILE_SIZE,
+          height: TILE_SIZE / 4,
         }),
       )
     }
@@ -261,10 +261,10 @@ const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
           srcY, // source x, y
           tileSize,
           tileSize, // source width, height
-          x * 16,
-          y * 16, // destination x, y
-          16,
-          16, // destination width, height
+          x * TILE_SIZE,
+          y * TILE_SIZE, // destination x, y
+          TILE_SIZE,
+          TILE_SIZE, // destination width, height
         )
       }
     })
@@ -272,7 +272,7 @@ const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
 }
 
 const renderStaticLayers = async (layersData) => {
-  const tileSize = 16
+  const tileSize = TILE_SIZE
   const layerArrays = Object.values(layersData)
   const maxWidth = Math.max(...layerArrays.map((layer) => layer[0].length))
   const maxHeight = Math.max(...layerArrays.map((layer) => layer.length))
@@ -422,10 +422,10 @@ function init() {
       if (symbol === 18) {
         gems.push(
           new Sprite({
-            x: x * 16,
-            y: y * 16,
-            width: 15,
-            height: 13,
+            x: x * TILE_SIZE,
+            y: y * TILE_SIZE,
+            width: 40,
+            height: 32,
             imageSrc: './images/gem.png',
             spriteCropbox: {
               x: 0,
@@ -435,10 +435,10 @@ function init() {
               frames: 5,
             },
             hitbox: {
-              x: x * 16,
-              y: y * 16,
-              width: 15,
-              height: 13,
+              x: x * TILE_SIZE,
+              y: y * TILE_SIZE,
+              width: 40,
+              height: 32,
             },
           }),
         )
@@ -461,19 +461,19 @@ function init() {
         if (symbol === 1) {
           oposums.push(
             new Oposum({
-              x: x * 16,
-              y: y * 16,
-              width: 36,
-              height: 28,
+              x: x * TILE_SIZE,
+              y: y * TILE_SIZE,
+              width: 80,
+              height: 64,
             }),
           )
         } else if (symbol === 2) {
           eagles.push(
             new Eagle({
-              x: x * 16,
-              y: y * 16,
-              width: 40,
-              height: 41,
+              x: x * TILE_SIZE,
+              y: y * TILE_SIZE,
+              width: 80,
+              height: 64,
             }),
           )
         }
@@ -485,8 +485,8 @@ function init() {
     new Sprite({
       x: 1800 + LEVEL_EXTENSION_OFFSET,
       y: 100,
-      width: 15,
-      height: 13,
+      width: 40,
+      height: 32,
       imageSrc: './images/gem.png',
       spriteCropbox: {
         x: 0,
@@ -498,8 +498,8 @@ function init() {
       hitbox: {
         x: 1800 + LEVEL_EXTENSION_OFFSET,
         y: 100,
-        width: 15,
-        height: 13,
+        width: 40,
+        height: 32,
       },
     }),
   )
@@ -580,8 +580,8 @@ function animate(backgroundCanvas) {
           new Sprite({
             x: oposum.x,
             y: oposum.y,
-            width: 32,
-            height: 32,
+            width: 80,
+            height: 64,
             imageSrc: './images/enemy-death.png',
             spriteCropbox: {
               x: 0,
@@ -603,8 +603,8 @@ function animate(backgroundCanvas) {
           new Sprite({
             x: oposum.x,
             y: oposum.y,
-            width: 32,
-            height: 32,
+            width: 80,
+            height: 64,
             imageSrc: './images/enemy-death.png',
             spriteCropbox: {
               x: 0,
@@ -650,8 +650,8 @@ function animate(backgroundCanvas) {
           new Sprite({
             x: eagle.x,
             y: eagle.y,
-            width: 32,
-            height: 32,
+            width: 80,
+            height: 64,
             imageSrc: './images/enemy-death.png',
             spriteCropbox: {
               x: 0,
@@ -703,10 +703,10 @@ function animate(backgroundCanvas) {
       // create an item feedback animation
       sprites.push(
         new Sprite({
-          x: gem.x - 8,
-          y: gem.y - 8,
-          width: 32,
-          height: 32,
+          x: gem.x - 20,
+          y: gem.y - 16,
+          width: 80,
+          height: 64,
           imageSrc: './images/item-feedback.png',
           spriteCropbox: {
             x: 0,
