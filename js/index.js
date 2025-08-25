@@ -1,22 +1,6 @@
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
-c.imageSmoothingEnabled = false
-const dpr = window.devicePixelRatio || 1
+// ctx is exposed globally by resizeCanvas.js
+const c = window.ctx
 const winScreen = document.getElementById('win-screen')
-
-function resizeCanvas() {
-  const { innerWidth, innerHeight } = window
-  canvas.width = innerWidth * dpr
-  canvas.height = innerHeight * dpr
-  canvas.style.width = `${innerWidth}px`
-  canvas.style.height = `${innerHeight}px`
-  // Reset any existing transforms; scaling for high-DPI displays is handled
-  // within the render loop to avoid applying the device pixel ratio twice.
-  c.setTransform(1, 0, 0, 1, 0, 0)
-}
-
-resizeCanvas()
-window.addEventListener('resize', resizeCanvas)
 
 const oceanLayerData = {
   l_New_Layer_1: l_New_Layer_1,
@@ -38,24 +22,24 @@ const layersData = {
 }
 
 const tilesets = {
-  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
-  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
-  l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
-  l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
-  l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
-  l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
-  l_Shrooms: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
-  l_Collisions: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
-  l_Grass: { imageUrl: './images/tileset.png', tileSize: TILE_NATIVE },
-  l_Trees: { imageUrl: './images/decorations.png', tileSize: TILE_NATIVE },
+  l_New_Layer_1: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
+  l_New_Layer_2: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
+  l_New_Layer_8: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
+  l_Back_Tiles: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
+  l_Decorations: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
+  l_Front_Tiles: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
+  l_Shrooms: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
+  l_Collisions: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
+  l_Grass: { imageUrl: './images/tileset.png', tileSize: TILESIZE_SRC },
+  l_Trees: { imageUrl: './images/decorations.png', tileSize: TILESIZE_SRC },
 }
 
 // Determine on-screen tile and figure sizes
-let tile_on_screen_px = TILE_NATIVE
+let tile_on_screen_px = TILESIZE_LOGIC
 const figure_on_screen_px = clamp(
-  Math.round((FIGURE_NATIVE / TILE_NATIVE) * tile_on_screen_px),
-  Math.round((FIGURE_NATIVE - 1) * tile_on_screen_px / TILE_NATIVE),
-  Math.round((FIGURE_NATIVE + 1) * tile_on_screen_px / TILE_NATIVE),
+  Math.round((FIGURE_NATIVE / TILESIZE_SRC) * TILESIZE_LOGIC),
+  Math.round(((FIGURE_NATIVE - 1) * TILESIZE_LOGIC) / TILESIZE_SRC),
+  Math.round(((FIGURE_NATIVE + 1) * TILESIZE_LOGIC) / TILESIZE_SRC),
 )
 const player_scale = figure_on_screen_px / FIGURE_NATIVE
 const LEVEL_EXTENSION_COLUMNS = 20
@@ -192,7 +176,7 @@ collisions.forEach((row, y) => {
 
 const l_Filler = createFillerLayer(collisions)
 layersData.l_Filler = l_Filler
-tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILE_NATIVE }
+tilesets.l_Filler = { imageUrl: './images/filler.png', tileSize: TILESIZE_SRC }
 
 const LEVEL_EXTENSION_OFFSET = LEVEL_EXTENSION_COLUMNS * tile_on_screen_px
 
@@ -404,10 +388,7 @@ const keys = {
 }
 
 let lastTime = performance.now()
-let camera = {
-  x: 0,
-  y: 0,
-}
+let camera = cam
 
 let oceanBackgroundCanvas = null
 let brambleBackgroundCanvas = null
@@ -581,10 +562,8 @@ function init() {
     }),
   ]
 
-  camera = {
-    x: 0,
-    y: 0,
-  }
+  camera.x = 0
+  camera.y = 0
 }
 
 function animate(backgroundCanvas) {
@@ -773,30 +752,14 @@ function animate(backgroundCanvas) {
     }
   }
 
-  // Center camera on player and clamp to level bounds
-  const viewportWidth = canvas.width / dpr
-  const viewportHeight = canvas.height / dpr
-  const levelWidth = collisions[0].length * tile_on_screen_px
-  const levelHeight = collisions.length * tile_on_screen_px
-
-  camera.x = player.x - viewportWidth / 2
-  camera.y = player.y - viewportHeight / 2
-
-  const maxCamX = levelWidth - viewportWidth
-  const maxCamY = levelHeight - viewportHeight
-
-  camera.x =
-    maxCamX < 0 ? maxCamX / 2 : Math.max(0, Math.min(camera.x, maxCamX))
-  camera.y =
-    maxCamY < 0 ? maxCamY / 2 : Math.max(0, Math.min(camera.y, maxCamY))
+  // Update and apply camera
+  updateCamera(player)
 
   // Render scene
   c.save()
   c.clearRect(0, 0, canvas.width, canvas.height)
-  c.scale(dpr, dpr)
+  applyCamera(c)
   const camX = Math.round(camera.x)
-  const camY = Math.round(camera.y)
-  c.translate(-camX, -camY)
   c.drawImage(oceanBackgroundCanvas, Math.round(camX * 0.32), 0)
   c.drawImage(brambleBackgroundCanvas, Math.round(camX * 0.16), 0)
   c.drawImage(backgroundCanvas, 0, 0)
@@ -822,11 +785,10 @@ function animate(backgroundCanvas) {
     gem.draw(c)
   }
 
-  c.restore()
+  restoreCamera(c)
 
-  // UI save and restore
+  // UI
   c.save()
-  c.scale(dpr, dpr)
   for (let i = hearts.length - 1; i >= 0; i--) {
     const heart = hearts[i]
     heart.draw(c)

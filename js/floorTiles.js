@@ -1,5 +1,6 @@
-const SRC_TILE = 32;
-const DST_TILE = TILE_NATIVE;
+// Source tile size in asset and target logical tile size
+const SRC_TILE = TILESIZE_SRC;
+const DST_TILE = TILESIZE_LOGIC;
 const SCALE = DST_TILE / SRC_TILE;
 
 const floorAtlas = new Image();
