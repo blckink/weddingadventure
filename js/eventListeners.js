@@ -39,69 +39,54 @@ window.addEventListener('focus', () => {
 })
 
 // Touch controls
-const joystickBase = document.getElementById('joystick-base')
-const joystickKnob = document.getElementById('joystick-knob')
-const attackButton = document.getElementById('attack-button')
-const jumpButton = document.getElementById('jump-button')
+const dpad = document.getElementById('dpad')
+const btnA = document.getElementById('btn-a')
+const btnB = document.getElementById('btn-b')
 
-let joystickPointerId = null
+let dpadPointerId = null
 let startX = 0
-let startY = 0
-const JOYSTICK_RADIUS = 50
+const DPAD_THRESHOLD = 20
 
-if (joystickBase && joystickKnob) {
-  joystickBase.addEventListener('pointerdown', (e) => {
-    joystickPointerId = e.pointerId
+if (dpad) {
+  dpad.addEventListener('pointerdown', (e) => {
+    dpadPointerId = e.pointerId
     startX = e.clientX
-    startY = e.clientY
-    joystickKnob.style.transition = '0s'
   })
 
-  joystickBase.addEventListener('pointermove', (e) => {
-    if (e.pointerId !== joystickPointerId) return
-
+  dpad.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== dpadPointerId) return
     const dx = e.clientX - startX
-    const dy = e.clientY - startY
-    const clampedX = Math.max(-JOYSTICK_RADIUS, Math.min(JOYSTICK_RADIUS, dx))
-    const clampedY = Math.max(-JOYSTICK_RADIUS, Math.min(JOYSTICK_RADIUS, dy))
-    joystickKnob.style.transform = `translate(${clampedX}px, ${clampedY}px)`
-
-    const normalizedX = clampedX / JOYSTICK_RADIUS
-
-    keys.a.pressed = normalizedX < -0.3
-    keys.d.pressed = normalizedX > 0.3
+    keys.a.pressed = dx < -DPAD_THRESHOLD
+    keys.d.pressed = dx > DPAD_THRESHOLD
   })
 
-  const endJoystick = () => {
-    joystickPointerId = null
-    joystickKnob.style.transition = '0.2s'
-    joystickKnob.style.transform = 'translate(0px, 0px)'
+  const endDpad = () => {
+    dpadPointerId = null
     keys.a.pressed = false
     keys.d.pressed = false
   }
 
-  joystickBase.addEventListener('pointerup', (e) => {
-    if (e.pointerId === joystickPointerId) endJoystick()
+  dpad.addEventListener('pointerup', (e) => {
+    if (e.pointerId === dpadPointerId) endDpad()
   })
-
-  joystickBase.addEventListener('pointercancel', (e) => {
-    if (e.pointerId === joystickPointerId) endJoystick()
+  dpad.addEventListener('pointercancel', (e) => {
+    if (e.pointerId === dpadPointerId) endDpad()
   })
 }
 
-if (attackButton) {
-  attackButton.addEventListener('pointerdown', () => {
+if (btnB) {
+  btnB.addEventListener('pointerdown', () => {
     player.attack()
   })
 }
 
-if (jumpButton) {
-  jumpButton.addEventListener('pointerdown', () => {
+if (btnA) {
+  btnA.addEventListener('pointerdown', () => {
     player.jump()
   })
 }
 
-const fullscreenButton = document.getElementById('fullscreen-button')
+const fullscreenButton = document.getElementById('fs-btn')
 if (fullscreenButton) {
   const toggleFullscreen = () => {
     const elem = document.documentElement
