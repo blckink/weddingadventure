@@ -2,7 +2,7 @@ const canvas = document.getElementById('editor');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 
-const tileSize = 64;
+const tileSize = TILE_NATIVE;
 let gridWidth;
 let gridHeight;
 let floors;
@@ -15,8 +15,15 @@ let illusions;
 if (typeof collisions !== 'undefined') {
   gridHeight = collisions.length;
   gridWidth = collisions[0].length;
-  floors = collisions.map((row) =>
-    row.map((cell) => (cell ? 'solid_mass' : 'air')),
+  floors = collisions.map((row, y) =>
+    row.map((cell, x) => {
+      if (!cell) return 'air';
+      const north = collisions[y - 1]?.[x] || 0;
+      const south = collisions[y + 1]?.[x] || 0;
+      if (!south) return 'overhang';
+      if (!north) return 'grass_top';
+      return 'solid_mass';
+    }),
   );
   blockers =
     typeof l_Blockers !== 'undefined' && l_Blockers.length
@@ -90,22 +97,26 @@ Promise.all([
   enemyImgs.oposum = oposum;
   enemyImgs.eagle = eagle;
   gemImg = gem;
-  const saved = localStorage.getItem('editorMap');
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    floors = parsed.floors;
-    enemies = parsed.enemies || [];
-    gems = parsed.gems || [];
-    blockers = parsed.blockers || blockers;
-    deaths = parsed.deaths || deaths;
-    illusions = parsed.illusions || illusions;
-    gridHeight = floors.length;
-    gridWidth = floors[0].length;
-    canvas.width = gridWidth * tileSize;
-    canvas.height = gridHeight * tileSize;
-  }
-  setupPalette();
-  drawGrid();
+  const start = () => {
+    const saved = localStorage.getItem('editorMap');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      floors = parsed.floors;
+      enemies = parsed.enemies || [];
+      gems = parsed.gems || [];
+      blockers = parsed.blockers || blockers;
+      deaths = parsed.deaths || deaths;
+      illusions = parsed.illusions || illusions;
+      gridHeight = floors.length;
+      gridWidth = floors[0].length;
+      canvas.width = gridWidth * tileSize;
+      canvas.height = gridHeight * tileSize;
+    }
+    setupPalette();
+    drawGrid();
+  };
+  if (FloorTiles.floorAtlas.complete) start();
+  else FloorTiles.floorAtlas.onload = start;
 });
 let currentTool = 'floor';
 let currentFloorType = 'solid_mass';
