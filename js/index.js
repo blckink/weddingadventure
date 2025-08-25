@@ -138,8 +138,6 @@ function createFillerLayer(collisions) {
 
 extendLevelRight([
   collisions,
-  l_New_Layer_1,
-  l_New_Layer_2,
   l_New_Layer_8,
   l_Back_Tiles,
   l_Decorations,
